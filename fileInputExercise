@@ -1,0 +1,11 @@
+def main():
+    fileHandler = open('file.txt','r')
+    myFile = fileHandler.readlines()
+    for i in range (len(myFile)):
+        if i == len(myFile)-1:
+            print(myFile[i])
+        else:
+            print(myFile[i][:-1])
+    fileHandler.close()
+
+main()
