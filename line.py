@@ -100,3 +100,5 @@ class Line(object):
 class MyDecimal(Decimal):
     def is_near_zero(self, eps=1e-10):
         return abs(self) < eps
+
+ell1 = Line(normal_vector=Vector(['4.046','2.836']), constant_term='1.21')
