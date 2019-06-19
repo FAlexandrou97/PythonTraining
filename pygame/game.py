@@ -2,20 +2,37 @@ import sys
 import pygame
 pygame.init()
 
+#Scene Setup
+
+#Models/Images
 size = width, height = 600, 400
-right = [10, 0]
-left = [-10, 0]
-up = [0, -10]
-down = [0, 10]
 black = 0, 0, 0
+blue = 0, 0, 255
 boundaries = yMin, xMin, xMax, yMax = 0, 0, width-40, height-40
 screen = pygame.display.set_mode(size)
-
+roadImage = pygame.image.load("pygame/road.png")
+roadImage = pygame.transform.scale(roadImage, (width, height))
+road = roadImage.get_rect(x=0, y=0)
+#Frog image radius = 40px approx.
 frogImage = pygame.image.load("pygame/frog.png")
 frogImage = pygame.transform.scale(frogImage, (40, 40))
-frog = frogImage.get_rect()
+frog = frogImage.get_rect(x=width/2-20, y=height-40)
+frogRadius = 40
 
+#Frog Movement Ratio
+right = [frogRadius, 0]
+left = [-frogRadius, 0]
+up = [0, -frogRadius]
+down = [0, frogRadius]
+
+
+
+
+#Main game loop
 while 1:
+    #Fill screen to "update scene"
+    #screen.fill(black)
+    screen.blit(roadImage, road)
     #Capture all events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -42,12 +59,12 @@ while 1:
             if(frog.y < yMax):
                 frog = frog.move(down)
 
-    # ballrect = ballrect.move(speed)
-    # if ballrect.left < 0 or ballrect.right > width:
-    #     speed[0] = -speed[0]
-    # if ballrect.top < 0 or ballrect.bottom > height:
-    #     speed[1] = -speed[1]
+    
 
-    screen.fill(black)
+    if(frog.colliderect(water)):
+        print("collision")
+    
+    #Update the rest of the images after the background
+    water = pygame.draw.rect(screen, blue, (0, 200, width, frogRadius))
     screen.blit(frogImage, frog)
     pygame.display.flip()
