@@ -1,6 +1,7 @@
 import sys
 import pygame
 pygame.init()
+pygame.mixer.init()
 
 #Scene Setup
 
@@ -19,6 +20,11 @@ frogImage = pygame.transform.scale(frogImage, (40, 40))
 frog = frogImage.get_rect(x=width/2-20, y=height-40)
 frogRadius = 40
 
+#Music
+pygame.mixer.music.load("pygame/music.mp3")
+pygame.mixer.music.play()
+
+
 #Frog Movement Ratio
 right = [frogRadius, 0]
 left = [-frogRadius, 0]
@@ -26,13 +32,16 @@ up = [0, -frogRadius]
 down = [0, frogRadius]
 
 
-
-
 #Main game loop
 while 1:
     #Fill screen to "update scene"
     #screen.fill(black)
     screen.blit(roadImage, road)
+
+    #Update the rest of the images after the background
+    water = pygame.draw.rect(screen, blue, (0, 200, width, frogRadius))
+    screen.blit(frogImage, frog)
+
     #Capture all events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -58,13 +67,8 @@ while 1:
             print("Going Down")
             if(frog.y < yMax):
                 frog = frog.move(down)
-
-    
-
+                
     if(frog.colliderect(water)):
         print("collision")
     
-    #Update the rest of the images after the background
-    water = pygame.draw.rect(screen, blue, (0, 200, width, frogRadius))
-    screen.blit(frogImage, frog)
     pygame.display.flip()
