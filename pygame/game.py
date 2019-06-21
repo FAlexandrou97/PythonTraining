@@ -1,5 +1,6 @@
 import sys
 import pygame
+import os.path
 pygame.init()
 pygame.mixer.init()
 pygame.font.init()
@@ -9,51 +10,65 @@ g_screenSize = width, height = 600, 400
 
 class Frog:
     # Class variables
-    m_radius = 40
-    m_image = pygame.image.load("frog.png")
-    m_image = pygame.transform.scale(m_image, (m_radius, m_radius))
-    m_frog = m_image.get_rect(x=width/2-20, y=height-40)
+    radius = 30
+    image = pygame.image.load("frog.png")
+    image = pygame.transform.scale(image, (radius, radius))
+    rect = image.get_rect(x=width / 2 - radius, y=height - radius)
 
     # Class Methods
     def Movement(self, event):
-        frog = self.m_frog
-        boundaries = yMin, xMin, xMax, yMax = 0, 0, width-40, height-40
-        right = [self.m_radius, 0]
-        left = [-self.m_radius, 0]
-        up = [0, -self.m_radius]
-        down = [0, self.m_radius]
+        frog = self.rect
+        boundaries = yMin, xMin, xMax, yMax = self.radius, 0, width-self.radius, height-self.radius
+        right = [self.radius, 0]
+        left = [-self.radius, 0]
+        up = [0, -self.radius]
+        down = [0, self.radius]
         # Keyboard Controls
         if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
             print("Going Left")
             # Boundaries
             if(frog.x > xMin):
-                self.m_frog = frog.move(left)               
+                self.rect = frog.move(left)
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
             print("Going Right")
             if(frog.x < xMax):
-                self.m_frog = frog.move(right)
+                self.rect = frog.move(right)
         if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
             print("Going Up")
             if(frog.y > yMin):
-                self.m_frog = frog.move(up)
+                self.rect = frog.move(up)
         if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
             print("Going Down")
             if(frog.y < yMax):
-                self.m_frog = frog.move(down)
+                self.rect = frog.move(down)
+
+    def ResetPosition(self):
+        self.rect.x = width / 2 - self.radius
+        self.rect.y = height - self.radius
 
     # Constructor
     def __init__(self):
         pass
 
 
-class Enemy:
-    # Constructor
-    def __init__(self, x, y, xVelocity, width, height):
-        self.x = x
-        self.y = y
-        self.xVelocity = xVelocity
-        self.width = width
-        self.height = height
+class Enemy(pygame.sprite.Sprite):
+    '''
+    Spawn an enemy
+    '''
+    def __init__(self, x, y, img):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load(os.path.join('', img))
+        self.image = pygame.transform.scale(self.image, (60, 60))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+    def Movement(self, velocity, direction="right"):
+        if direction == "right":
+            self.rect = self.rect.move(velocity, 0)
+        else:
+            self.rect = self.rect.move(-velocity, 0)
+
 
 def exitGame(event):
     if event.type == pygame.QUIT:
@@ -87,38 +102,35 @@ def main():
     objFrog = Frog()
 
     # Enemy Object
-    objEnemy = Enemy(x=100, y=0, xVelocity=.3, width=30, height=10)
-    enemyX = 0
-    enemyVelocity = 0.2
-    enemy = pygame.draw.rect(screen, black, (enemyX, height-80, 80, objFrog.m_radius))
-
+    objEnemy = Enemy(x=100, y=100, img="enemy.png")
 
     # Main game loop
     while 1:
         # Fill screen to "update scene"
         screen.blit(roadImage, road)
         # 60fps cap
-        textsurface = myfont.render((str(clock.get_fps())), True, black)
+        textSurface = myfont.render((str(clock.get_fps())), True, black)
         clock.tick(60)
 
         # Update the rest of the images after the background
         water = pygame.draw.rect(screen, blue, (0, 160, width, 40))
-        enemy = pygame.draw.rect(screen, black, (enemyX, height-80, 80, objFrog.m_radius))
-        objEnemy = pygame.draw.rect(screen, black, (objEnemy.x, objEnemy.y, objEnemy.width, objEnemy.height))
-        screen.blit(objFrog.m_image, objFrog.m_frog)
-        screen.blit(textsurface, (50,50))
+        screen.blit(objFrog.image, objFrog.rect)
+        screen.blit(textSurface, (50, 50))
+        screen.blit(objEnemy.image, objEnemy.rect)
 
         # Capture all events
         for event in pygame.event.get():
             exitGame(event)
             objFrog.Movement(event)
 
-        enemyX = enemyX + enemyVelocity
-
+        objEnemy.Movement(2)
 
         # Collisions             
-        if objFrog.m_frog.colliderect(water):
+        if objFrog.rect.colliderect(water):
             print("collision")
+
+        if objFrog.rect.colliderect(objEnemy.rect):
+            objFrog.ResetPosition()
 
         pygame.display.update()
 
