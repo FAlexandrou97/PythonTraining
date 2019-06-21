@@ -2,27 +2,30 @@ import sys
 import pygame
 pygame.init()
 pygame.mixer.init()
+pygame.font.init()
+
+g_screenSize = width, height = 600, 400
 
 class Frog:
-    screenSize = width, height = 600, 400
-    #Class variables
+    # Class variables
+    m_radius = 40
     m_image = pygame.image.load("pygame/frog.png")
-    m_Image = pygame.transform.scale(m_image, (40, 40))
+    m_image = pygame.transform.scale(m_image, (m_radius, m_radius))
     m_frog = m_image.get_rect(x=width/2-20, y=height-40)
-    m_Radius = 40
+    
 
-    #Class Methods
-    def Movement(self):
+    # Class Methods
+    def Movement(self, event):
         frog = self.m_frog
         boundaries = yMin, xMin, xMax, yMax = 0, 0, width-40, height-40
-        right = [self.m_Radius, 0]
-        left = [-self.m_Radius, 0]
-        up = [0, -self.m_Radius]
-        down = [0, self.m_Radius]
-        #Keyboard Controls
+        right = [self.m_radius, 0]
+        left = [-self.m_radius, 0]
+        up = [0, -self.m_radius]
+        down = [0, self.m_radius]
+        # Keyboard Controls
         if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
             print("Going Left")
-            #Boundaries
+            # Boundaries
             if(frog.x > xMin):
                 self.m_frog = frog.move(left)               
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
@@ -38,49 +41,74 @@ class Frog:
             if(frog.y < yMax):
                 self.m_frog = frog.move(down)
 
-         #Constructor
+         # Constructor
     def __init__(self):
         pass
 
-#Scene Setup
 
-#Colours (RGB)
-black = 0, 0, 0
-blue = 0, 0, 255
+def exitGame(event):
+    if event.type == pygame.QUIT:
+        sys.exit()
+    if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+        sys.exit()
 
-#Models/Images
-screenSize = width, height = 600, 400
-screen = pygame.display.set_mode(screenSize)
-roadImage = pygame.image.load("pygame/road.png")
-roadImage = pygame.transform.scale(roadImage, (width, height))
-road = roadImage.get_rect(x=0, y=0)
 
-#Music
-pygame.mixer.music.load("pygame/music.mp3")
-pygame.mixer.music.play()
+def main():
+    # Scene Setup
 
-#Frog Object
-objFrog = Frog()
+    # Colours (RGB)
+    black = 0, 0, 0
+    blue = 0, 0, 255
 
-#Main game loop
-while 1:
-    #Fill screen to "update scene"
-    screen.blit(roadImage, road)
+    # Models/Images
+    screen = pygame.display.set_mode(g_screenSize)
+    roadImage = pygame.image.load("pygame/road.png")
+    roadImage = pygame.transform.scale(roadImage, (width, height))
+    road = roadImage.get_rect(x=0, y=0)
 
-    #Update the rest of the images after the background
-    water = pygame.draw.rect(screen, blue, (0, 200, width, objFrog.m_Radius))
-    screen.blit(objFrog.m_Image, objFrog.m_frog)
+    # Fonts
+    myfont = pygame.font.SysFont('Comic Sans MS', 30)
+    clock = pygame.time.Clock()
 
-    #Capture all events
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            sys.exit()
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-            sys.exit()
+    # Music
+    pygame.mixer.music.load("pygame/music.mp3")
+    pygame.mixer.music.play()
 
-        objFrog.Movement()
-                
-    if(objFrog.m_frog.colliderect(water)):
-        print("collision")
-    
-    pygame.display.update()
+    # Frog Object
+    objFrog = Frog()
+
+    # Enemy
+    enemyX = 0
+    enemyVelocity = 0.2
+    enemy = pygame.draw.rect(screen, black, (enemyX, height-80, 80, objFrog.m_radius))
+
+    # Main game loop
+    while 1:
+        # Fill screen to "update scene"
+        screen.blit(roadImage, road)
+        # 60fps cap
+        textsurface = myfont.render((str(clock.get_fps())), True, black)
+        clock.tick(60)
+
+        # Update the rest of the images after the background
+        water = pygame.draw.rect(screen, blue, (0, 160, width, 40))
+        enemy = pygame.draw.rect(screen, black, (enemyX, height-80, 80, objFrog.m_radius))
+        screen.blit(objFrog.m_image, objFrog.m_frog)
+        screen.blit(textsurface, (50,50))
+
+        # Capture all events
+        for event in pygame.event.get():
+            exitGame(event)
+            objFrog.Movement(event)
+
+
+        enemyX = enemyX + enemyVelocity
+
+        # Collisions             
+        if(objFrog.m_frog.colliderect(water)):
+            print("collision")
+
+        pygame.display.update()
+
+if __name__ == "__main__":
+    main()
