@@ -5,13 +5,13 @@ pygame.init()
 pygame.mixer.init()
 pygame.font.init()
 
-g_screenSize = width, height = 600, 400
+g_screenSize = width, height = 1024, 600
 
 
 class Frog:
     # Class variables
-    radius = 30
-    image = pygame.image.load("frog.png")
+    radius = 35
+    image = pygame.image.load("pygame/frog.png")
     image = pygame.transform.scale(image, (radius, radius))
     rect = image.get_rect(x=width / 2 - radius, y=height - radius)
 
@@ -55,10 +55,11 @@ class Enemy(pygame.sprite.Sprite):
     '''
     Spawn an enemy
     '''
+    radius = 70
     def __init__(self, x, y, img):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(os.path.join('', img))
-        self.image = pygame.transform.scale(self.image, (60, 60))
+        self.image = pygame.image.load(os.path.join('pygame/', img))
+        self.image = pygame.transform.scale(self.image, (self.radius, self.radius))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -86,44 +87,75 @@ def main():
 
     # Models/Images
     screen = pygame.display.set_mode(g_screenSize)
-    roadImage = pygame.image.load("road.png")
-    roadImage = pygame.transform.scale(roadImage, (width, height))
-    road = roadImage.get_rect(x=0, y=0)
+    # Road
+    roadImage = pygame.image.load("pygame/road.png")
+    roadImage = pygame.transform.scale(roadImage, (width, int(height/3)))
+    road = roadImage.get_rect(x=0, y=height * 0.542)
+    # Water
+    waterImage = pygame.image.load("pygame/water.png")
+    waterImage = pygame.transform.scale(waterImage, (roadImage.get_width(), roadImage.get_height()))
+    water = waterImage.get_rect(x=0, y=height * 0.14)
+    # Grass
+    grassImage = pygame.image.load("pygame/grass.jpg")
+    listGrass = (grassImage.get_rect(x=0, y=height-175),
+                grassImage.get_rect(x=200, y=height-175),
+                grassImage.get_rect(x=400, y=height-175),
+                grassImage.get_rect(x=600, y=height-175),
+                grassImage.get_rect(x=800, y=height-175),
+                grassImage.get_rect(x=0, y=height* 0.4),
+                grassImage.get_rect(x=200, y=height* 0.4),
+                grassImage.get_rect(x=400, y=height* 0.4),
+                grassImage.get_rect(x=600, y=height* 0.4),
+                grassImage.get_rect(x=800, y=height* 0.4))
 
     # Fonts
     myfont = pygame.font.SysFont('Comic Sans MS', 30)
     clock = pygame.time.Clock()
 
     # Music
-    pygame.mixer.music.load("music.mp3")
+    pygame.mixer.music.load("pygame/music.mp3")
     pygame.mixer.music.play()
 
     # Frog Object
     objFrog = Frog()
 
     # Enemy Object
-    objEnemy = Enemy(x=100, y=100, img="enemy.png")
+        
+    objEnemy = Enemy(x=0, y=450, img="enemy.png")
+    objEnemy2 = Enemy(x=width, y=350, img="enemy.png")
+
 
     # Main game loop
     while 1:
         # Fill screen to "update scene"
-        screen.blit(roadImage, road)
+        
         # 60fps cap
         textSurface = myfont.render((str(clock.get_fps())), True, black)
         clock.tick(60)
 
         # Update the rest of the images after the background
-        water = pygame.draw.rect(screen, blue, (0, 160, width, 40))
+        screen.blit(textSurface, (50, 50))  # FPS
+        for grass in listGrass:
+            screen.blit(grassImage, grass)
+
+        # Update road after grass to "cut" grass image size
+        screen.blit(roadImage, road)
+
+        screen.blit(waterImage, water)
         screen.blit(objFrog.image, objFrog.rect)
-        screen.blit(textSurface, (50, 50))
+       
         screen.blit(objEnemy.image, objEnemy.rect)
+        screen.blit(objEnemy2.image, objEnemy2.rect)
+
 
         # Capture all events
         for event in pygame.event.get():
             exitGame(event)
             objFrog.Movement(event)
 
-        objEnemy.Movement(2)
+        objEnemy.Movement(velocity=2, direction="right")
+        objEnemy2.Movement(velocity=1, direction="left")
+
 
         # Collisions             
         if objFrog.rect.colliderect(water):
