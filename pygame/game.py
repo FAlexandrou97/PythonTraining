@@ -51,11 +51,7 @@ class Frog:
         pass
 
 
-class Enemy(pygame.sprite.Sprite):
-    '''
-    Spawn an enemy
-    '''
-    radius = 70
+class MovingModel(pygame.sprite.Sprite):
     def __init__(self, x, y, img):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(os.path.join('', img))
@@ -65,6 +61,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.y = y
 
     def Movement(self, velocity, direction="right"):
+        self.velocity = velocity
         if direction == "right":
             self.rect = self.rect.move(velocity, 0)
             if self.rect.x > width:
@@ -75,8 +72,23 @@ class Enemy(pygame.sprite.Sprite):
             self.rect = self.rect.move(-velocity, 0)
 
 
+class Turtle(MovingModel):
+    radius = 50
+    def __init__(self, x, y, img):
+        MovingModel.__init__(self, x, y, img)
+        self.image = pygame.transform.smoothscale(self.image, (self.radius, self.radius))
 
 
+class Car(MovingModel):
+    radius = 70
+
+
+class Trunk(MovingModel):
+    radius = 85
+    def __init__(self, x, y, img):
+        MovingModel.__init__(self, x, y, img)
+        self.image = pygame.transform.smoothscale(self.image, (self.radius + 50, self.radius))
+        
 
 def exitGame(event):
     if event.type == pygame.QUIT:
@@ -94,14 +106,17 @@ def main():
 
     # Models/Images
     screen = pygame.display.set_mode(g_screenSize)
+
     # Road
     roadImage = pygame.image.load("road.png")
     roadImage = pygame.transform.scale(roadImage, (width, int(height/3)))
     road = roadImage.get_rect(x=0, y=height * 0.542)
+
     # Water
     waterImage = pygame.image.load("water.png")
     waterImage = pygame.transform.scale(waterImage, (roadImage.get_width(), roadImage.get_height()))
     water = waterImage.get_rect(x=0, y=height * 0.14)
+
     # Grass
     grassImage = pygame.image.load("grass.jpg")
     listGrass = (grassImage.get_rect(x=0, y=height-175),
@@ -126,23 +141,20 @@ def main():
     # Frog Object
     objFrog = Frog()
 
-    # Enemy Object
-    listObjectEnemy = (Enemy(x=0, y=460, img="carBlack.png"),
-                       Enemy(x=400, y=460, img="carTruckRight.png"),
-                       Enemy(x=width, y=410, img="carFast.png"),
-                       Enemy(x=0, y=365, img="carWhiteRight.png"),
-                       Enemy(x=width-100, y=320, img="carTruckLeft.png"),
-                       Enemy(x=100, y=320, img="carWhiteLeft.png"))
-    # objEnemy = Enemy(x=0, y=460, img="carBlack.png")
-    # objEnemy1 = Enemy(x=400, y=460, img="carTruckRight.png")
-    #
-    # objEnemy2 = Enemy(x=0, y=365, img="carWhiteRight.png")
-    # objEnemy3 = Enemy(x=width, y=410, img="carFast.png")
-    # objEnemy4 = Enemy(x=width-100, y=310, img="carTruckLeft.png")
-    # objEnemy5 = Enemy(x=100, y=310, img="carWhiteLeft.png")
+    # Car Object
+    listObjectEnemy = (Car(x=0, y=460, img="carBlack.png"),
+                       Car(x=400, y=460, img="carTruckRight.png"),
+                       Car(x=width, y=410, img="carFast.png"),
+                       Car(x=0, y=365, img="carWhiteRight.png"),
+                       Car(x=width-100, y=320, img="carTruckLeft.png"),
+                       Car(x=100, y=320, img="carWhiteLeft.png"))
 
+    # Turtle Object
+    turtle = Turtle(x=width/2, y=height/3 +30, img="turtle.png")
 
-
+    # Trunk Object
+    trunk = Trunk(x=width/2, y=160,img="trunk.png")
+    
     # Main game loop
     while 1:
         # Fill screen to "update scene"
@@ -160,12 +172,12 @@ def main():
         screen.blit(roadImage, road)
 
         screen.blit(waterImage, water)
+        screen.blit(turtle.image, turtle.rect)
+        screen.blit(trunk.image, trunk.rect)
         screen.blit(objFrog.image, objFrog.rect)
 
         for enemy in listObjectEnemy:
             screen.blit(enemy.image, enemy.rect)
-
-
 
         # Capture all events
         for event in pygame.event.get():
@@ -179,17 +191,15 @@ def main():
         listObjectEnemy[4].Movement(velocity=4, direction="left")
         listObjectEnemy[5].Movement(velocity=4, direction="left")
 
-
-
-
-        # objEnemy.Movement(velocity=2, direction="right")
-        # objEnemy1.Movement(velocity=2, direction="right")
-        # objEnemy2.Movement(velocity=3, direction="right")
-        # objEnemy3.Movement(velocity=10, direction="left")
-
+        turtle.Movement(velocity=2,direction="right")
+        trunk.Movement(velocity=1, direction="left")
 
         # Collisions             
-        if objFrog.rect.colliderect(water):
+        if objFrog.rect.colliderect(water) and objFrog.rect.colliderect(turtle.rect):    
+            objFrog.rect = objFrog.rect.move(turtle.velocity,0)
+        elif objFrog.rect.colliderect(water) and objFrog.rect.colliderect(trunk.rect):    
+            objFrog.rect = objFrog.rect.move(-trunk.velocity,0)
+        elif objFrog.rect.colliderect(water):
             print("collision")
             objFrog.ResetPosition()
 
@@ -198,7 +208,10 @@ def main():
                 print("collision")
                 objFrog.ResetPosition()
 
-
+        # Reset Frog position when it goes off screen (staying on turtle for too long)
+        if (objFrog.rect.x > width) or (objFrog.rect.x < 0):
+            objFrog.ResetPosition()
+    
         pygame.display.update()
 
 
