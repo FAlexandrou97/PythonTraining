@@ -1,11 +1,16 @@
-import cx_Freeze
+from cx_Freeze import setup, Executable
+import os.path
 
-executables = [cx_Freeze.Executable("game.py")]
+os.environ['TCL_LIBRARY'] = r'C:\Program Files\Python35-32\tcl\tcl8.6'
+os.environ['TK_LIBRARY'] = r'C:\Program Files\Python35-32\tcl\tk8.6'
 
-cx_Freeze.setup(
-    name="Frogger Mabye",
-    options={"build_exe": {"packages":["pygame"],
-                           "include_files":["frog.png"]}},
-    executables = executables
-
-    )
+includefiles=["frog.png", "carBlack.png", "carFast.png", "carTruckLeft.png", "carTruckRight.png",
+              "carWhiteLeft.png", "carWhiteRight.png", "grass.jpg", "road.png", "water.png",
+              "music.mp3"]
+setup(
+    name="Froggerz",
+    version="0.1",
+    description="test",
+    options={'build_exe': {'include_files': includefiles}},
+    executables=[Executable("game.py")],
+)
