@@ -74,6 +74,7 @@ class MovingModel(pygame.sprite.Sprite):
 
 class Turtle(MovingModel):
     radius = 40
+
     def __init__(self, x, y, img):
         MovingModel.__init__(self, x, y, img)
         self.image = pygame.transform.smoothscale(self.image, (self.radius, self.radius))
@@ -85,10 +86,34 @@ class Car(MovingModel):
 
 class Trunk(MovingModel):
     radius = 85
+
     def __init__(self, x, y, img):
         MovingModel.__init__(self, x, y, img)
         self.image = pygame.transform.smoothscale(self.image, (self.radius+50, self.radius-45))
-        
+
+
+class Fly(MovingModel):
+    radius = 40
+
+    def __init__(self, x, y, img):
+        MovingModel.__init__(self, x, y, img)
+        self.image = pygame.transform.smoothscale(self.image, (self.radius, self.radius))
+        self.maxY = self.rect.y + 3
+        self.minY = self.rect.y - 3
+        self.velocity = 1
+
+    def Movement(self, velocity):
+
+
+        if self.rect.y >= self.maxY:
+            self.velocity = 1 * -self.velocity
+
+        elif self.rect.y <= self.minY:
+            self.velocity = 1 * -self.velocity
+
+        self.rect = self.rect.move(0, self.velocity)
+
+
 
 def exitGame(event):
     if event.type == pygame.QUIT:
@@ -167,7 +192,15 @@ def main():
                         Trunk(x=width-100, y=90, img="trunk.png"),
                         Trunk(x=width/3, y=90, img="trunk.png"),
                         Trunk(x=width-200, y=90, img="trunk.png"))
-    
+
+    # Fly Object
+    listObjectFly = (Fly(x=0, y=30, img="fly.png"),
+                     Fly(x=275, y=30, img="fly.png"),
+                     Fly(x=425, y=30, img="fly.png"),
+                     Fly(x=575, y=30, img="fly.png"),
+                     Fly(x=984, y=30, img="fly.png"))
+
+    time = 0
     # Main game loop
     while 1:
         # Fill screen to "update scene"
@@ -196,8 +229,20 @@ def main():
             trunk.Movement(velocity=1.5, direction="left")
             screen.blit(trunk.image, trunk.rect)
 
+        # Update Fly
+        # Slow down movement because minimum velocity is 1
+        time = time + clock.get_time()
+        if time >= 100:
+            for fly in listObjectFly:
+                fly.Movement(velocity=1)
+            time = 0
+
+        for fly in listObjectFly:
+            screen.blit(fly.image, fly.rect)
+
         # Update Frog
         screen.blit(objFrog.image, objFrog.rect)
+
 
         for car in listObjectCar:
             screen.blit(car.image, car.rect)
