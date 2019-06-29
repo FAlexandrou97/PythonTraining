@@ -101,17 +101,19 @@ class Fly(MovingModel):
         self.maxY = self.rect.y + 3
         self.minY = self.rect.y - 3
         self.velocity = 1
+        self.alive = True
 
+    # Override generic method
     def Movement(self, velocity):
+        if self.alive:
 
+            if self.rect.y >= self.maxY:
+                self.velocity = 1 * -self.velocity
 
-        if self.rect.y >= self.maxY:
-            self.velocity = 1 * -self.velocity
+            elif self.rect.y <= self.minY:
+                self.velocity = 1 * -self.velocity
 
-        elif self.rect.y <= self.minY:
-            self.velocity = 1 * -self.velocity
-
-        self.rect = self.rect.move(0, self.velocity)
+            self.rect = self.rect.move(0, self.velocity)
 
 
 
@@ -120,6 +122,20 @@ def exitGame(event):
         sys.exit()
     if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
         sys.exit()
+
+
+'''
+Source:
+stackoverflow.com/questions/42821442/how-do-i-change-the-colour-of-an-image-in-pygame-without-changing-its-transparen
+'''
+def fill(surface, color):
+    """Fill all pixels of the surface with color, preserve transparency."""
+    w, h = surface.get_size()
+    r, g, b, _ = color
+    for x in range(w):
+        for y in range(h):
+            a = surface.get_at((x, y))[3]
+            surface.set_at((x, y), pygame.Color(r, g, b, a))
 
 
 def main():
@@ -194,11 +210,11 @@ def main():
                         Trunk(x=width-200, y=90, img="trunk.png"))
 
     # Fly Object
-    listObjectFly = (Fly(x=0, y=30, img="fly.png"),
-                     Fly(x=275, y=30, img="fly.png"),
-                     Fly(x=425, y=30, img="fly.png"),
-                     Fly(x=575, y=30, img="fly.png"),
-                     Fly(x=984, y=30, img="fly.png"))
+    listObjectFly = (Fly(x=100, y=30, img="fly.png"),
+                     Fly(x=295, y=30, img="fly.png"),
+                     Fly(x=490, y=30, img="fly.png"),
+                     Fly(x=685, y=30, img="fly.png"),
+                     Fly(x=880, y=30, img="fly.png"))
 
     time = 0
     # Main game loop
@@ -288,6 +304,14 @@ def main():
             if objFrog.rect.colliderect(enemy.rect):
                 print("collision")
                 objFrog.ResetPosition()
+
+        # Frog - Fly
+        for fly in listObjectFly:
+            if objFrog.rect.colliderect(fly.rect):
+                print("POINT!!")
+                # Turn fly into green color
+                fill(fly.image, pygame.Color(0, 128, 0))
+                fly.alive = False
 
         # Reset Frog position when it goes off screen (staying on turtle for too long)
         if (objFrog.rect.x > width) or (objFrog.rect.x < 0):
