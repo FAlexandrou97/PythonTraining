@@ -171,6 +171,17 @@ def main():
                 grassImage.get_rect(x=600, y=height* 0.4),
                 grassImage.get_rect(x=800, y=height* 0.4))
 
+    greenGrassImage = pygame.image.load("grass_green.jpg")
+    greenGrassTopImage = pygame.transform.smoothscale(greenGrassImage, (width, 10))
+    greenGrassImage = pygame.transform.smoothscale(greenGrassImage, (130, 90))
+    listGreenGrass = (greenGrassImage.get_rect(x=-40, y=0),
+                      greenGrassImage.get_rect(x=155, y=0),
+                      greenGrassImage.get_rect(x=345, y=0),
+                      greenGrassImage.get_rect(x=545, y=0),
+                      greenGrassImage.get_rect(x=740, y=0),
+                      greenGrassImage.get_rect(x=935, y=0))
+    greenGrassTop = greenGrassImage.get_rect(x=0, y=0)
+
     # Fonts
     myfont = pygame.font.SysFont('Comic Sans MS', 30)
     clock = pygame.time.Clock()
@@ -226,14 +237,21 @@ def main():
         clock.tick(60)
 
         # Update the rest of the images after the background
-        screen.blit(textSurface, (50, 50))  # FPS
+
         for grass in listGrass:
             screen.blit(grassImage, grass)
 
         # Update road after grass to "cut" grass image size
         screen.blit(roadImage, road)
 
+        # Update top Grass (Green)
+        for greenGrass in listGreenGrass:
+            screen.blit(greenGrassImage, greenGrass)
+
+        screen.blit(greenGrassTopImage, greenGrassTop)
+
         screen.blit(waterImage, water)
+
 
         # Update Turtle
         for turtle in listObjectTurtle:
@@ -259,6 +277,7 @@ def main():
         # Update Frog
         screen.blit(objFrog.image, objFrog.rect)
 
+        screen.blit(textSurface, (50, 50))  # FPS
 
         for car in listObjectCar:
             screen.blit(car.image, car.rect)
@@ -308,7 +327,6 @@ def main():
         # Frog - Fly
         for fly in listObjectFly:
             if objFrog.rect.colliderect(fly.rect):
-                print("POINT!!")
                 # Turn fly into green color
                 fill(fly.image, pygame.Color(0, 128, 0))
                 fly.alive = False
