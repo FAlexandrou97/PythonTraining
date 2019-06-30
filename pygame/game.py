@@ -1,6 +1,7 @@
 import sys
 import pygame
 import os.path
+import random
 pygame.init()
 pygame.mixer.init()
 pygame.font.init()
@@ -94,6 +95,8 @@ class Trunk(MovingModel):
 
 class Fly(MovingModel):
     radius = 40
+    activeFlySequence = set([0, 1, 2, 3, 4])
+
 
     def __init__(self, x, y, img):
         MovingModel.__init__(self, x, y, img)
@@ -172,7 +175,7 @@ def main():
                 grassImage.get_rect(x=800, y=height* 0.4))
 
     greenGrassImage = pygame.image.load("grass_green.jpg")
-    greenGrassTopImage = pygame.transform.smoothscale(greenGrassImage, (width, 10))
+    greenGrassTopImage = pygame.transform.smoothscale(greenGrassImage, (200, 20))
     greenGrassImage = pygame.transform.smoothscale(greenGrassImage, (130, 90))
     listGreenGrass = (greenGrassImage.get_rect(x=-40, y=0),
                       greenGrassImage.get_rect(x=155, y=0),
@@ -180,8 +183,14 @@ def main():
                       greenGrassImage.get_rect(x=545, y=0),
                       greenGrassImage.get_rect(x=740, y=0),
                       greenGrassImage.get_rect(x=935, y=0))
-    greenGrassTop = greenGrassImage.get_rect(x=0, y=0)
 
+    listGreenGrassTop = (greenGrassImage.get_rect(x=0, y=0),
+                      greenGrassImage.get_rect(x=155, y=0),
+                      greenGrassImage.get_rect(x=345, y=0),
+                      greenGrassImage.get_rect(x=545, y=0),
+                      greenGrassImage.get_rect(x=740, y=0),
+                      greenGrassImage.get_rect(x=935, y=0))
+    
     # Fonts
     myfont = pygame.font.SysFont('Comic Sans MS', 30)
     clock = pygame.time.Clock()
@@ -228,10 +237,14 @@ def main():
                      Fly(x=880, y=30, img="fly.png"))
 
     time = 0
+
+    
+
     # Main game loop
     while 1:
         # Fill screen to "update scene"
-        
+        screen.fill(black)
+
         # 60fps cap
         textSurface = myfont.render((str(clock.get_fps())), True, black)
         clock.tick(60)
@@ -245,10 +258,10 @@ def main():
         screen.blit(roadImage, road)
 
         # Update top Grass (Green)
-        for greenGrass in listGreenGrass:
+        for greenGrass, greenGrassTop in zip(listGreenGrass, listGreenGrassTop):
             screen.blit(greenGrassImage, greenGrass)
+            screen.blit(greenGrassTopImage, greenGrassTop)
 
-        screen.blit(greenGrassTopImage, greenGrassTop)
 
         screen.blit(waterImage, water)
 
@@ -271,13 +284,18 @@ def main():
                 fly.Movement(velocity=1)
             time = 0
 
-        for fly in listObjectFly:
-            screen.blit(fly.image, fly.rect)
+        # Fly random spawn
+        if len(Fly.activeFlySequence) > 0 :
+            randomFlySpawn = random.choice(tuple(Fly.activeFlySequence))
+        screen.blit(listObjectFly[randomFlySpawn].image,
+         listObjectFly[randomFlySpawn].rect)
+
 
         # Update Frog
         screen.blit(objFrog.image, objFrog.rect)
 
-        screen.blit(textSurface, (50, 50))  # FPS
+        # FPS
+        screen.blit(textSurface, (50, 50))  
 
         for car in listObjectCar:
             screen.blit(car.image, car.rect)
@@ -287,6 +305,7 @@ def main():
             exitGame(event)
             objFrog.Movement(event)
 
+        # Car Movement
         listObjectCar[0].Movement(velocity=2, direction="right")
         listObjectCar[1].Movement(velocity=2, direction="right")
         listObjectCar[2].Movement(velocity=10, direction="left")
@@ -325,11 +344,17 @@ def main():
                 objFrog.ResetPosition()
 
         # Frog - Fly
-        for fly in listObjectFly:
+        for index, fly in enumerate(listObjectFly):
             if objFrog.rect.colliderect(fly.rect):
                 # Turn fly into green color
                 fill(fly.image, pygame.Color(0, 128, 0))
+                # Remove location from spawning so alive flies won't overlap dead flies
+                Fly.activeFlySequence.discard(index)
+                #fly.randSequence.discard(fly.rect.x)
                 fly.alive = False
+            
+            if not(fly.alive):
+                screen.blit(fly.image, fly.rect)
 
         # Reset Frog position when it goes off screen (staying on turtle for too long)
         if (objFrog.rect.x > width) or (objFrog.rect.x < 0):
