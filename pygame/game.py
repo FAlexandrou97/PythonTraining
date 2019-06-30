@@ -164,15 +164,15 @@ def main():
     # Grass
     grassImage = pygame.image.load("grass.jpg")
     listGrass = (grassImage.get_rect(x=0, y=height-175),
-                grassImage.get_rect(x=200, y=height-175),
-                grassImage.get_rect(x=400, y=height-175),
-                grassImage.get_rect(x=600, y=height-175),
-                grassImage.get_rect(x=800, y=height-175),
-                grassImage.get_rect(x=0, y=height* 0.4),
-                grassImage.get_rect(x=200, y=height* 0.4),
-                grassImage.get_rect(x=400, y=height* 0.4),
-                grassImage.get_rect(x=600, y=height* 0.4),
-                grassImage.get_rect(x=800, y=height* 0.4))
+                 grassImage.get_rect(x=200, y=height-175),
+                 grassImage.get_rect(x=400, y=height-175),
+                 grassImage.get_rect(x=600, y=height-175),
+                 grassImage.get_rect(x=800, y=height-175),
+                 grassImage.get_rect(x=0, y=height* 0.4),
+                 grassImage.get_rect(x=200, y=height* 0.4),
+                 grassImage.get_rect(x=400, y=height* 0.4),
+                 grassImage.get_rect(x=600, y=height* 0.4),
+                 grassImage.get_rect(x=800, y=height* 0.4))
 
     greenGrassImage = pygame.image.load("grass_green.jpg")
     greenGrassTopImage = pygame.transform.smoothscale(greenGrassImage, (200, 20))
@@ -185,11 +185,11 @@ def main():
                       greenGrassImage.get_rect(x=935, y=0))
 
     listGreenGrassTop = (greenGrassImage.get_rect(x=0, y=0),
-                      greenGrassImage.get_rect(x=155, y=0),
-                      greenGrassImage.get_rect(x=345, y=0),
-                      greenGrassImage.get_rect(x=545, y=0),
-                      greenGrassImage.get_rect(x=740, y=0),
-                      greenGrassImage.get_rect(x=935, y=0))
+                         greenGrassImage.get_rect(x=155, y=0),
+                         greenGrassImage.get_rect(x=345, y=0),
+                         greenGrassImage.get_rect(x=545, y=0),
+                         greenGrassImage.get_rect(x=740, y=0),
+                         greenGrassImage.get_rect(x=935, y=0))
     
     # Fonts
     myfont = pygame.font.SysFont('Comic Sans MS', 30)
@@ -204,11 +204,11 @@ def main():
 
     # Car Object
     listObjectCar = (Car(x=0, y=460, img="carBlack.png"),
-                       Car(x=400, y=460, img="carTruckRight.png"),
-                       Car(x=width, y=410, img="carFast.png"),
-                       Car(x=0, y=365, img="carWhiteRight.png"),
-                       Car(x=width-100, y=320, img="carTruckLeft.png"),
-                       Car(x=100, y=320, img="carWhiteLeft.png"))
+                     Car(x=400, y=460, img="carTruckRight.png"),
+                     Car(x=width, y=410, img="carFast.png"),
+                     Car(x=0, y=365, img="carWhiteRight.png"),
+                     Car(x=width-100, y=320, img="carTruckLeft.png"),
+                     Car(x=100, y=320, img="carWhiteLeft.png"))
 
     # Turtle Object
     listObjectTurtle = (Turtle(x=145, y=240, img="turtle.png"),
@@ -224,10 +224,10 @@ def main():
                         
     # Trunk Object
     listObjectTrunk = (Trunk(x=width/2, y=190, img="trunk.png"),
-                        Trunk(x=width+100, y=190, img="trunk.png"),
-                        Trunk(x=width-100, y=90, img="trunk.png"),
-                        Trunk(x=width/3, y=90, img="trunk.png"),
-                        Trunk(x=width-200, y=90, img="trunk.png"))
+                       Trunk(x=width+100, y=190, img="trunk.png"),
+                       Trunk(x=width-100, y=90, img="trunk.png"),
+                       Trunk(x=width/3, y=90, img="trunk.png"),
+                       Trunk(x=width-200, y=90, img="trunk.png"))
 
     # Fly Object
     listObjectFly = (Fly(x=100, y=30, img="fly.png"),
@@ -236,8 +236,9 @@ def main():
                      Fly(x=685, y=30, img="fly.png"),
                      Fly(x=880, y=30, img="fly.png"))
 
-    time = 0
-
+    timeFlyMovement = 0
+    timeFlySpawn = 0
+    randomFlySpawn = random.choice(tuple(Fly.activeFlySequence))
     
 
     # Main game loop
@@ -246,7 +247,7 @@ def main():
         screen.fill(black)
 
         # 60fps cap
-        textSurface = myfont.render((str(clock.get_fps())), True, black)
+        textSurface = myfont.render((str(int(clock.get_fps()))), True, black)
         clock.tick(60)
 
         # Update the rest of the images after the background
@@ -262,9 +263,8 @@ def main():
             screen.blit(greenGrassImage, greenGrass)
             screen.blit(greenGrassTopImage, greenGrassTop)
 
-
+        # Render Water
         screen.blit(waterImage, water)
-
 
         # Update Turtle
         for turtle in listObjectTurtle:
@@ -277,19 +277,31 @@ def main():
             screen.blit(trunk.image, trunk.rect)
 
         # Update Fly
+        timeFlyMovement = timeFlyMovement + clock.get_time()
+        timeFlySpawn = timeFlySpawn + clock.get_time()
+
+        # Fly Movement
         # Slow down movement because minimum velocity is 1
-        time = time + clock.get_time()
-        if time >= 100:
+        if timeFlyMovement >= 100:
             for fly in listObjectFly:
                 fly.Movement(velocity=1)
-            time = 0
+            timeFlyMovement = 0
 
         # Fly random spawn
-        if len(Fly.activeFlySequence) > 0 :
-            randomFlySpawn = random.choice(tuple(Fly.activeFlySequence))
-        screen.blit(listObjectFly[randomFlySpawn].image,
-         listObjectFly[randomFlySpawn].rect)
+        if timeFlySpawn >= 5000:
+            if len(Fly.activeFlySequence) > 0 :
+                randomFlySpawn = random.choice(tuple(Fly.activeFlySequence))
+                timeFlySpawn = 0
 
+        # Render Fly
+        for fly in listObjectFly:
+            if fly.alive:
+                # Render Random Fly
+                screen.blit(listObjectFly[randomFlySpawn].image,
+                listObjectFly[randomFlySpawn].rect)
+            else:
+                # Render Dead Fly
+                screen.blit(fly.image, fly.rect)
 
         # Update Frog
         screen.blit(objFrog.image, objFrog.rect)
@@ -344,20 +356,16 @@ def main():
                 objFrog.ResetPosition()
 
         # Frog - Fly
-        for index, fly in enumerate(listObjectFly):
-            if objFrog.rect.colliderect(fly.rect):
-                # Turn fly into green color
-                fill(fly.image, pygame.Color(0, 128, 0))
-                # Remove location from spawning so alive flies won't overlap dead flies
-                Fly.activeFlySequence.discard(index)
-                #fly.randSequence.discard(fly.rect.x)
-                fly.alive = False
-            
-            if not(fly.alive):
-                screen.blit(fly.image, fly.rect)
+        # Check if frog collides with the random spawned fly
+        if objFrog.rect.colliderect(listObjectFly[randomFlySpawn].rect):
+            # Turn fly into green color
+            fill(listObjectFly[randomFlySpawn].image, pygame.Color(0, 128, 0))
+            # Remove fly from random spawning set
+            Fly.activeFlySequence.discard(randomFlySpawn)
+            listObjectFly[randomFlySpawn].alive = False
 
         # Reset Frog position when it goes off screen (staying on turtle for too long)
-        if (objFrog.rect.x > width) or (objFrog.rect.x < 0):
+        if (objFrog.rect.x > width) or (objFrog.rect.x < -30):
             objFrog.ResetPosition()
     
         pygame.display.update()
