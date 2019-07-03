@@ -15,6 +15,8 @@ class Frog:
     image = pygame.image.load("frog.png")
     image = pygame.transform.scale(image, (radius, radius))
     rect = image.get_rect(x=width / 2 - radius, y=height - radius)
+    kills = 0
+    life = 3
 
     # Class Methods
     def Movement(self, event):
@@ -146,7 +148,6 @@ def main():
 
     # Colours (RGB)
     black = 0, 0, 0
-    blue = 0, 0, 255
 
     # Models/Images
     screen = pygame.display.set_mode(g_screenSize)
@@ -238,6 +239,7 @@ def main():
 
     timeFlyMovement = 0
     timeFlySpawn = 0
+    collisionTimer = 0
     randomFlySpawn = random.choice(tuple(Fly.activeFlySequence))
     
 
@@ -247,7 +249,8 @@ def main():
         screen.fill(black)
 
         # 60fps cap
-        textSurface = myfont.render((str(int(clock.get_fps()))), True, black)
+        fpsText = myfont.render("fps:" + str(int(clock.get_fps())), True, black)
+        lifeText = myfont.render("Life:" + str(objFrog.life), True, black)
         clock.tick(60)
 
         # Update the rest of the images after the background
@@ -306,13 +309,18 @@ def main():
         # Update Frog
         screen.blit(objFrog.image, objFrog.rect)
 
+        # Update texts
+
         # FPS
-        screen.blit(textSurface, (50, 50))  
+        screen.blit(fpsText, (0, 0))
+
+        # Frog Life
+        screen.blit(lifeText, (0, 30))
 
         for car in listObjectCar:
             screen.blit(car.image, car.rect)
 
-        # Capture all events
+        # Capture all events (keyboard events)
         for event in pygame.event.get():
             exitGame(event)
             objFrog.Movement(event)
@@ -326,47 +334,66 @@ def main():
         listObjectCar[5].Movement(velocity=4, direction="left")
 
 
-        # COLLISION DETECTION - RESOLUTION 
+        # COLLISION DETECTION - RESOLUTION
+
         frogTurtleCollision = False
         frogTrunkCollision = False
         # Frog - Turtle
-        for turtle in listObjectTurtle:
-            if objFrog.rect.colliderect(water) and objFrog.rect.colliderect(turtle.rect):
-                frogTurtleCollision = True
-        # Frog - Trunk
-        for trunk in listObjectTrunk:
-            if objFrog.rect.colliderect(water) and objFrog.rect.colliderect(trunk.rect):
-                frogTrunkCollision = True
+        if objFrog.rect.y < height/2:   # if statement for increased efficiency
+            for turtle in listObjectTurtle:
+                if objFrog.rect.colliderect(water) and objFrog.rect.colliderect(turtle.rect):
+                    frogTurtleCollision = True
+                    break
 
-        # Collision Resolutions
-        if frogTurtleCollision:
-            objFrog.rect = objFrog.rect.move(turtle.velocity,0)
-        elif frogTrunkCollision:
-            objFrog.rect = objFrog.rect.move(-trunk.velocity,0)
+            # Frog - Trunk
+            for trunk in listObjectTrunk:
+                if objFrog.rect.colliderect(water) and objFrog.rect.colliderect(trunk.rect):
+                    frogTrunkCollision = True
+                    break
+
+            # Collision Resolutions
+            if frogTurtleCollision:
+                objFrog.rect = objFrog.rect.move(turtle.velocity,0)
+            elif frogTrunkCollision:
+                objFrog.rect = objFrog.rect.move(-trunk.velocity,0)
         
-        # Frog - Water
-        elif objFrog.rect.colliderect(water):
-            print("collision")
-            objFrog.ResetPosition()
-
-        # Frog - Car
-        for enemy in listObjectCar:
-            if objFrog.rect.colliderect(enemy.rect):
+            # Frog - Water
+            elif objFrog.rect.colliderect(water):
                 print("collision")
                 objFrog.ResetPosition()
 
-        # Frog - Fly
-        # Check if frog collides with the random spawned fly
-        if objFrog.rect.colliderect(listObjectFly[randomFlySpawn].rect):
-            # Turn fly into green color
-            fill(listObjectFly[randomFlySpawn].image, pygame.Color(0, 128, 0))
-            # Remove fly from random spawning set
-            Fly.activeFlySequence.discard(randomFlySpawn)
-            listObjectFly[randomFlySpawn].alive = False
+            # Frog - Fly
+            # Check if frog collides with the random spawned fly
+            collisionTimer += clock.get_time()
+            if collisionTimer >= 200:   # Added to fix an error causing the collision to occur multiple times
+                if objFrog.rect.colliderect(listObjectFly[randomFlySpawn].rect):
+                    collisionTimer = 0
+                    # Turn fly into green color
+                    fill(listObjectFly[randomFlySpawn].image, pygame.Color(0, 128, 0))
+                    # Remove fly from random spawning set
+                    Fly.activeFlySequence.discard(randomFlySpawn)
+                    listObjectFly[randomFlySpawn].alive = False
+                    objFrog.kills += 1
+
+        # Frog - Car
+        if objFrog.rect.y > height/2:   # if statement for increased efficiency
+            for enemy in listObjectCar:
+                if objFrog.rect.colliderect(enemy.rect):
+                    print("collision")
+                    objFrog.ResetPosition()
+                    break
+
+
 
         # Reset Frog position when it goes off screen (staying on turtle for too long)
         if (objFrog.rect.x > width) or (objFrog.rect.x < -30):
             objFrog.ResetPosition()
+
+        if objFrog.kills == 5:
+            print("Game Won!!")
+
+        if objFrog.life == 0:
+            print("Game Lost!!")
     
         pygame.display.update()
 
