@@ -193,7 +193,8 @@ def main():
                          greenGrassImage.get_rect(x=935, y=0))
     
     # Fonts
-    myfont = pygame.font.SysFont('Comic Sans MS', 30)
+    myfont = pygame.font.SysFont('Comic Sans MS', 25)
+    pauseFont = pygame.font.SysFont('Comic Sans MS', 75)
     clock = pygame.time.Clock()
 
     # Music
@@ -241,161 +242,212 @@ def main():
     timeFlySpawn = 0
     collisionTimer = 0
     randomFlySpawn = random.choice(tuple(Fly.activeFlySequence))
-    
+
+    # Game states
+    ''' 0: Intro State
+        1: Play State
+        2: Pause State
+        3: Over State '''
+    gameState = 1
 
     # Main game loop
     while 1:
-        # Fill screen to "update scene"
-        screen.fill(black)
 
-        # 60fps cap
-        fpsText = myfont.render("fps:" + str(int(clock.get_fps())), True, black)
-        lifeText = myfont.render("Life:" + str(objFrog.life), True, black)
-        clock.tick(60)
+        # --INTRO STATE--
+        if gameState == 0:
+            # Update Intro State
+            pass
+            # Introductory description of myself and the game
+            # Explain the goal of the game
+            # Display Controls
 
-        # Update the rest of the images after the background
+            # Intro State Transitions
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                    gameState = 1
 
-        for grass in listGrass:
-            screen.blit(grassImage, grass)
+                exitGame(event)
 
-        # Update road after grass to "cut" grass image size
-        screen.blit(roadImage, road)
+        # --PLAY STATE--
+        elif gameState == 1:
+            # Update Play State
 
-        # Update top Grass (Green)
-        for greenGrass, greenGrassTop in zip(listGreenGrass, listGreenGrassTop):
-            screen.blit(greenGrassImage, greenGrass)
-            screen.blit(greenGrassTopImage, greenGrassTop)
+            # Fill screen to "update scene"
+            screen.fill(black)
 
-        # Render Water
-        screen.blit(waterImage, water)
+            # 60fps cap
+            fpsText = myfont.render("fps:" + str(int(clock.get_fps())), True, black)
+            lifeText = myfont.render("Life:" + str(objFrog.life), True, black)
+            clock.tick(60)
 
-        # Update Turtle
-        for turtle in listObjectTurtle:
-            turtle.Movement(velocity=2.5,direction="right")
-            screen.blit(turtle.image, turtle.rect)
+            # Update the rest of the images after the background
 
-        # Update Trunk
-        for trunk in listObjectTrunk:
-            trunk.Movement(velocity=1.5, direction="left")
-            screen.blit(trunk.image, trunk.rect)
+            for grass in listGrass:
+                screen.blit(grassImage, grass)
 
-        # Update Fly
-        timeFlyMovement = timeFlyMovement + clock.get_time()
-        timeFlySpawn = timeFlySpawn + clock.get_time()
+            # Update road after grass to "cut" grass image size
+            screen.blit(roadImage, road)
 
-        # Fly Movement
-        # Slow down movement because minimum velocity is 1
-        if timeFlyMovement >= 100:
-            for fly in listObjectFly:
-                fly.Movement(velocity=1)
-            timeFlyMovement = 0
+            # Update top Grass (Green)
+            for greenGrass, greenGrassTop in zip(listGreenGrass, listGreenGrassTop):
+                screen.blit(greenGrassImage, greenGrass)
+                screen.blit(greenGrassTopImage, greenGrassTop)
 
-        # Fly random spawn
-        if timeFlySpawn >= 5000:
-            if len(Fly.activeFlySequence) > 0 :
-                randomFlySpawn = random.choice(tuple(Fly.activeFlySequence))
-                timeFlySpawn = 0
+            # Render Water
+            screen.blit(waterImage, water)
 
-        # Render Fly
-        for fly in listObjectFly:
-            if fly.alive:
-                # Render Random Fly
-                screen.blit(listObjectFly[randomFlySpawn].image,
-                listObjectFly[randomFlySpawn].rect)
-            else:
-                # Render Dead Fly
-                screen.blit(fly.image, fly.rect)
-
-        # Update Frog
-        screen.blit(objFrog.image, objFrog.rect)
-
-        # Update texts
-
-        # FPS
-        screen.blit(fpsText, (0, 0))
-
-        # Frog Life
-        screen.blit(lifeText, (0, 30))
-
-        for car in listObjectCar:
-            screen.blit(car.image, car.rect)
-
-        # Capture all events (keyboard events)
-        for event in pygame.event.get():
-            exitGame(event)
-            objFrog.Movement(event)
-
-        # Car Movement
-        listObjectCar[0].Movement(velocity=2, direction="right")
-        listObjectCar[1].Movement(velocity=2, direction="right")
-        listObjectCar[2].Movement(velocity=10, direction="left")
-        listObjectCar[3].Movement(velocity=3, direction="right")
-        listObjectCar[4].Movement(velocity=4, direction="left")
-        listObjectCar[5].Movement(velocity=4, direction="left")
-
-
-        # COLLISION DETECTION - RESOLUTION
-
-        frogTurtleCollision = False
-        frogTrunkCollision = False
-        # Frog - Turtle
-        if objFrog.rect.y < height/2:   # if statement for increased efficiency
+            # Update Turtle
             for turtle in listObjectTurtle:
-                if objFrog.rect.colliderect(water) and objFrog.rect.colliderect(turtle.rect):
-                    frogTurtleCollision = True
-                    break
+                turtle.Movement(velocity=2.5,direction="right")
+                screen.blit(turtle.image, turtle.rect)
 
-            # Frog - Trunk
+            # Update Trunk
             for trunk in listObjectTrunk:
-                if objFrog.rect.colliderect(water) and objFrog.rect.colliderect(trunk.rect):
-                    frogTrunkCollision = True
-                    break
+                trunk.Movement(velocity=1.5, direction="left")
+                screen.blit(trunk.image, trunk.rect)
 
-            # Collision Resolutions
-            if frogTurtleCollision:
-                objFrog.rect = objFrog.rect.move(turtle.velocity,0)
-            elif frogTrunkCollision:
-                objFrog.rect = objFrog.rect.move(-trunk.velocity,0)
-        
-            # Frog - Water
-            elif objFrog.rect.colliderect(water):
-                print("collision")
-                objFrog.ResetPosition()
+            # Update Fly
+            timeFlyMovement = timeFlyMovement + clock.get_time()
+            timeFlySpawn = timeFlySpawn + clock.get_time()
 
-            # Frog - Fly
-            # Check if frog collides with the random spawned fly
-            collisionTimer += clock.get_time()
-            if collisionTimer >= 200:   # Added to fix an error causing the collision to occur multiple times
-                if objFrog.rect.colliderect(listObjectFly[randomFlySpawn].rect):
-                    collisionTimer = 0
-                    # Turn fly into green color
-                    fill(listObjectFly[randomFlySpawn].image, pygame.Color(0, 128, 0))
-                    # Remove fly from random spawning set
-                    Fly.activeFlySequence.discard(randomFlySpawn)
-                    listObjectFly[randomFlySpawn].alive = False
-                    objFrog.kills += 1
+            # Fly Movement
+            # Slow down movement because minimum velocity is 1
+            if timeFlyMovement >= 100:
+                for fly in listObjectFly:
+                    fly.Movement(velocity=1)
+                timeFlyMovement = 0
 
-        # Frog - Car
-        if objFrog.rect.y > height/2:   # if statement for increased efficiency
-            for enemy in listObjectCar:
-                if objFrog.rect.colliderect(enemy.rect):
+            # Fly random spawn
+            if timeFlySpawn >= 5000:
+                if len(Fly.activeFlySequence) > 0 :
+                    randomFlySpawn = random.choice(tuple(Fly.activeFlySequence))
+                    timeFlySpawn = 0
+
+            # Render Fly
+            for fly in listObjectFly:
+                if fly.alive:
+                    # Render Random Fly
+                    screen.blit(listObjectFly[randomFlySpawn].image,
+                    listObjectFly[randomFlySpawn].rect)
+                else:
+                    # Render Dead Fly
+                    screen.blit(fly.image, fly.rect)
+
+            # Update Frog
+            screen.blit(objFrog.image, objFrog.rect)
+
+            # Update texts
+
+            # FPS
+            screen.blit(fpsText, (0, 0))
+
+            # Frog Life
+            screen.blit(lifeText, (0, 30))
+
+            for car in listObjectCar:
+                screen.blit(car.image, car.rect)
+
+            # Car Movement
+            listObjectCar[0].Movement(velocity=2, direction="right")
+            listObjectCar[1].Movement(velocity=2, direction="right")
+            listObjectCar[2].Movement(velocity=10, direction="left")
+            listObjectCar[3].Movement(velocity=3, direction="right")
+            listObjectCar[4].Movement(velocity=4, direction="left")
+            listObjectCar[5].Movement(velocity=4, direction="left")
+
+
+            # COLLISION DETECTION - RESOLUTION
+
+            frogTurtleCollision = False
+            frogTrunkCollision = False
+            # Frog - Turtle
+            if objFrog.rect.y < height/2:   # if statement for increased efficiency
+                for turtle in listObjectTurtle:
+                    if objFrog.rect.colliderect(water) and objFrog.rect.colliderect(turtle.rect):
+                        frogTurtleCollision = True
+                        break
+
+                # Frog - Trunk
+                for trunk in listObjectTrunk:
+                    if objFrog.rect.colliderect(water) and objFrog.rect.colliderect(trunk.rect):
+                        frogTrunkCollision = True
+                        break
+
+                # Collision Resolutions
+                if frogTurtleCollision:
+                    objFrog.rect = objFrog.rect.move(turtle.velocity,0)
+                elif frogTrunkCollision:
+                    objFrog.rect = objFrog.rect.move(-trunk.velocity,0)
+
+                # Frog - Water
+                elif objFrog.rect.colliderect(water):
                     print("collision")
                     objFrog.ResetPosition()
-                    break
+
+                # Frog - Fly
+                # Check if frog collides with the random spawned fly
+                collisionTimer += clock.get_time()
+                if collisionTimer >= 200:   # Added to fix an error causing the collision to occur multiple times
+                    if objFrog.rect.colliderect(listObjectFly[randomFlySpawn].rect):
+                        collisionTimer = 0
+                        # Turn fly into green color
+                        fill(listObjectFly[randomFlySpawn].image, pygame.Color(0, 128, 0))
+                        # Remove fly from random spawning set
+                        Fly.activeFlySequence.discard(randomFlySpawn)
+                        listObjectFly[randomFlySpawn].alive = False
+                        objFrog.kills += 1
+
+            # Frog - Car
+            if objFrog.rect.y > height/2:   # if statement for increased efficiency
+                for enemy in listObjectCar:
+                    if objFrog.rect.colliderect(enemy.rect):
+                        print("collision")
+                        objFrog.ResetPosition()
+                        break
 
 
 
-        # Reset Frog position when it goes off screen (staying on turtle for too long)
-        if (objFrog.rect.x > width) or (objFrog.rect.x < -30):
-            objFrog.ResetPosition()
+            # Reset Frog position when it goes off screen (staying on turtle for too long)
+            if (objFrog.rect.x > width) or (objFrog.rect.x < -30):
+                objFrog.ResetPosition()
 
-        if objFrog.kills == 5:
-            print("Game Won!!")
+            if objFrog.kills == 5:
+                print("Game Won!!")
 
-        if objFrog.life == 0:
-            print("Game Lost!!")
-    
-        pygame.display.update()
+            if objFrog.life == 0:
+                print("Game Lost!!")
+
+            pygame.display.update()
+
+
+            # Capture all events (keyboard events)
+            for event in pygame.event.get():
+                exitGame(event)
+                objFrog.Movement(event)
+
+            # Play State Transitions
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
+                    gameState = 2
+
+            if objFrog.life == 0:
+                gameState = 3
+
+        # --PAUSE STATE--
+        elif gameState == 2:
+            # Update Pause State
+            pauseText = pauseFont.render("PAUSED", True, black)
+            screen.blit(pauseText, (width/2-125, height/2-75))
+            pygame.display.update()
+
+            # Pause State Transitions
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
+                    gameState = 1
+                exitGame(event)
+
+        # --OVER STATE--
+        elif gameState == 3:
+            pass
 
 
 if __name__ == "__main__":
