@@ -21,7 +21,7 @@ class Frog:
     # Class Methods
     def Movement(self, event):
         frog = self.rect
-        boundaries = yMin, xMin, xMax, yMax = self.radius, 0, width-self.radius, height-self.radius
+        boundaries = yMin, xMin, xMax, yMax = self.radius, self.radius, width-self.radius*2, height-self.radius
         right = [self.radius, 0]
         left = [-self.radius, 0]
         up = [0, -self.radius]
@@ -148,10 +148,11 @@ def main():
 
     # Colours (RGB)
     black = 0, 0, 0
-    white = 77, 166, 255
+    skyBlue = 77, 166, 255
 
     # Models/Images
     screen = pygame.display.set_mode(g_screenSize)
+    pygame.display.set_caption('Frogger Made With Pygame')
 
     # Road
     roadImage = pygame.image.load("road.png")
@@ -196,6 +197,7 @@ def main():
     # Fonts
     myfont = pygame.font.SysFont('Comic Sans MS', 25)
     pauseFont = pygame.font.SysFont('Comic Sans MS', 75)
+    winFont = pygame.font.SysFont('Comic Sans MS', 30)
 
     # Music
     pygame.mixer.music.load("music.mp3")
@@ -261,6 +263,7 @@ def main():
     wave = 1
     gameTime = 60
     gameTimeDecrease = 0
+    showFPS = False
 
     # Main game loop
     while 1:
@@ -268,10 +271,28 @@ def main():
         # --INTRO STATE--
         if gameState == 0:
             # Update Intro State
-            pass
-            # Introductory description of myself and the game
-            # Explain the goal of the game
-            # Display Controls
+            screen.fill(skyBlue)
+            listIntroText = (winFont.render("FROGGER - Press Enter To Start", True, black),
+                             winFont.render("Goal: Eat all flies and avoid getting drown or hit by cars!!", True, black),
+                             winFont.render("Extra: Wave System with increasing difficulty", True, black),
+                             winFont.render("Controls", True, black),
+                             winFont.render("Arrow keys: Move frog", True, black),
+                             winFont.render("P: Pause/Show Controls", True, black),
+                             winFont.render("ESC: Exit Game", True, black),
+                             winFont.render("F: Show FPS", True, black),
+                             winFont.render("Enter/Return: Start Game/Advance to next wave", True, black))
+            listDeveloperText = (myfont.render("The game was created for the summer hacker challenge 2019 of UCLan Cyprus", True, black),
+                                 myfont.render("Student/Developer: Floris Alexandrou", True, black))
+
+            h = 0
+            for text in listIntroText:
+                screen.blit(text, (100, h))
+                h+=50
+            h+=50
+            for text in listDeveloperText:
+                screen.blit(text, (100, h))
+                h+=50
+            pygame.display.update()
 
             # Intro State Transitions
             for event in pygame.event.get():
@@ -286,12 +307,13 @@ def main():
 
             # Fill screen to "update scene"
             screen.fill(black)
-            pygame.draw.rect(screen, white, (0, 0, width, 30))
+            pygame.draw.rect(screen, skyBlue, (0, 0, width, 30))
 
             # Render Fonts
             # 60fps cap
             fpsText = myfont.render("fps:" + str(int(clock.get_fps())), True, black)
             lifeText = myfont.render("Lives:" + str(objFrog.life), True, black)
+            waveText = myfont.render("Wave:" + str(wave), True, black)
             gameTimeText = myfont.render("Time Remaining:" + str(gameTime), True, black)
             clock.tick(60)
 
@@ -360,13 +382,17 @@ def main():
             # Update texts
 
             # FPS
-            screen.blit(fpsText, (940, -5))
+            if showFPS:
+                screen.blit(fpsText, (940, -5))
 
             # Frog Life
             screen.blit(lifeText, (5, -5))
 
             # Time
-            screen.blit(gameTimeText, (200, -5))
+            screen.blit(gameTimeText, (210, -5))
+
+            # Wave
+            screen.blit(waveText, (100, -5))
 
             for car in listObjectCar:
                 screen.blit(car.image, car.rect)
@@ -430,8 +456,8 @@ def main():
                         objFrog.ResetPosition()
                         break
 
-            # Reset Frog position when it goes out of bounds(staying on turtle for too long)
-            if (objFrog.rect.x > width) or (objFrog.rect.x < -30):
+            # Reset Frog position when it goes out of bounds(e.g staying on turtle for too long)
+            if (objFrog.rect.x > width-10) or (objFrog.rect.x < -20):
                 objFrog.life -= 1
                 objFrog.ResetPosition()
 
@@ -446,9 +472,21 @@ def main():
                 exitGame(event)
                 objFrog.Movement(event)
 
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_f:
+                    if not showFPS:
+                        showFPS = True
+                    else:
+                        showFPS = False
+
             # Play State Transitions
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
                     gameState = 2
+
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_3:
+                    gameState = 3
+
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_0:
+                    gameState = 0
 
             if objFrog.life == 0:
                 gameState = 4
@@ -475,15 +513,23 @@ def main():
         # --WIN STATE--
         elif gameState == 3:
             # Update Win State
-
+            winText = winFont.render("Congratulations, Press Enter to proceed to the next wave!!", True, black)
+            screen.blit(winText, (100, height / 2 - 75))
+            pygame.display.update()
             # Win State Transitions
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                    objFrog.ResetPosition()
                     if gameTimeDecrease < 20:
                         gameTimeDecrease += 2
                     gameTime = 60 - gameTimeDecrease
                     wave += 1
                     gameState = 1
+                    listObjectFly = (Fly(x=100, y=60, img="fly.png"),
+                                     Fly(x=295, y=60, img="fly.png"),
+                                     Fly(x=490, y=60, img="fly.png"),
+                                     Fly(x=685, y=60, img="fly.png"),
+                                     Fly(x=880, y=60, img="fly.png"))
 
         # --OVER STATE--
         elif gameState == 4:
