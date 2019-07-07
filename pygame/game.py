@@ -76,7 +76,7 @@ class MovingModel(pygame.sprite.Sprite):
 
 
 class Turtle(MovingModel):
-    radius = 40
+    radius = 30
 
     def __init__(self, x, y, img):
         MovingModel.__init__(self, x, y, img)
@@ -148,6 +148,7 @@ def main():
 
     # Colours (RGB)
     black = 0, 0, 0
+    white = 77, 166, 255
 
     # Models/Images
     screen = pygame.display.set_mode(g_screenSize)
@@ -159,8 +160,8 @@ def main():
 
     # Water
     waterImage = pygame.image.load("water.png")
-    waterImage = pygame.transform.scale(waterImage, (roadImage.get_width(), roadImage.get_height()))
-    water = waterImage.get_rect(x=0, y=height * 0.14)
+    waterImage = pygame.transform.scale(waterImage, (roadImage.get_width(), roadImage.get_height()-30))
+    water = waterImage.get_rect(x=0, y=height * 0.14 +30)
 
     # Grass
     grassImage = pygame.image.load("grass.jpg")
@@ -178,28 +179,30 @@ def main():
     greenGrassImage = pygame.image.load("grass_green.jpg")
     greenGrassTopImage = pygame.transform.smoothscale(greenGrassImage, (200, 20))
     greenGrassImage = pygame.transform.smoothscale(greenGrassImage, (130, 90))
-    listGreenGrass = (greenGrassImage.get_rect(x=-40, y=0),
-                      greenGrassImage.get_rect(x=155, y=0),
-                      greenGrassImage.get_rect(x=345, y=0),
-                      greenGrassImage.get_rect(x=545, y=0),
-                      greenGrassImage.get_rect(x=740, y=0),
-                      greenGrassImage.get_rect(x=935, y=0))
+    listGreenGrass = (greenGrassImage.get_rect(x=-40, y=30),
+                      greenGrassImage.get_rect(x=155, y=30),
+                      greenGrassImage.get_rect(x=345, y=30),
+                      greenGrassImage.get_rect(x=545, y=30),
+                      greenGrassImage.get_rect(x=740, y=30),
+                      greenGrassImage.get_rect(x=935, y=30))
 
-    listGreenGrassTop = (greenGrassImage.get_rect(x=0, y=0),
-                         greenGrassImage.get_rect(x=155, y=0),
-                         greenGrassImage.get_rect(x=345, y=0),
-                         greenGrassImage.get_rect(x=545, y=0),
-                         greenGrassImage.get_rect(x=740, y=0),
-                         greenGrassImage.get_rect(x=935, y=0))
+    listGreenGrassTop = (greenGrassImage.get_rect(x=0, y=30),
+                         greenGrassImage.get_rect(x=155, y=30),
+                         greenGrassImage.get_rect(x=345, y=30),
+                         greenGrassImage.get_rect(x=545, y=30),
+                         greenGrassImage.get_rect(x=740, y=30),
+                         greenGrassImage.get_rect(x=935, y=30))
     
     # Fonts
     myfont = pygame.font.SysFont('Comic Sans MS', 25)
     pauseFont = pygame.font.SysFont('Comic Sans MS', 75)
-    clock = pygame.time.Clock()
 
     # Music
     pygame.mixer.music.load("music.mp3")
     pygame.mixer.music.play()
+
+    # Clock Object
+    clock = pygame.time.Clock()
 
     # Frog Object
     objFrog = Frog()
@@ -213,31 +216,36 @@ def main():
                      Car(x=100, y=320, img="carWhiteLeft.png"))
 
     # Turtle Object
-    listObjectTurtle = (Turtle(x=145, y=240, img="turtle.png"),
-                        Turtle(x=190, y=240, img="turtle.png"),
-                        Turtle(x=235, y=240, img="turtle.png"),
-                        Turtle(x=545, y=240, img="turtle.png"),
-                        Turtle(x=590, y=240, img="turtle.png"),
-                        Turtle(x=45, y=140, img="turtle.png"),
-                        Turtle(x=90, y=140, img="turtle.png"),
-                        Turtle(x=135, y=140, img="turtle.png"),
-                        Turtle(x=745, y=140, img="turtle.png"),
-                        Turtle(x=790, y=140, img="turtle.png"))
+    listObjectTurtle = (Turtle(x=145, y=252, img="turtle.png"),
+                        Turtle(x=190, y=252, img="turtle.png"),
+                        Turtle(x=235, y=252, img="turtle.png"),
+                        Turtle(x=545, y=252, img="turtle.png"),
+                        Turtle(x=590, y=252, img="turtle.png"),
+                        Turtle(x=45, y=185, img="turtle.png"),
+                        Turtle(x=90, y=185, img="turtle.png"),
+                        Turtle(x=135, y=185, img="turtle.png"),
+                        Turtle(x=745, y=185, img="turtle.png"),
+                        Turtle(x=790, y=185, img="turtle.png"),
+                        Turtle(x=30, y=115, img="turtle.png"),
+                        Turtle(x=275, y=115, img="turtle.png"),
+                        Turtle(x=565, y=115, img="turtle.png"),
+                        Turtle(x=890, y=115, img="turtle.png"))
                         
     # Trunk Object
-    listObjectTrunk = (Trunk(x=width/2, y=190, img="trunk.png"),
-                       Trunk(x=width+100, y=190, img="trunk.png"),
-                       Trunk(x=width-100, y=90, img="trunk.png"),
-                       Trunk(x=width/3, y=90, img="trunk.png"),
-                       Trunk(x=width-200, y=90, img="trunk.png"))
+    listObjectTrunk = (Trunk(x=width/2, y=215, img="trunk.png"),
+                       Trunk(x=width+100, y=215, img="trunk.png"),
+                       Trunk(x=width-100, y=145, img="trunk.png"),
+                       Trunk(x=width/3, y=145, img="trunk.png"),
+                       Trunk(x=width-200, y=145, img="trunk.png"))
 
     # Fly Object
-    listObjectFly = (Fly(x=100, y=30, img="fly.png"),
-                     Fly(x=295, y=30, img="fly.png"),
-                     Fly(x=490, y=30, img="fly.png"),
-                     Fly(x=685, y=30, img="fly.png"),
-                     Fly(x=880, y=30, img="fly.png"))
+    listObjectFly = (Fly(x=100, y=60, img="fly.png"),
+                     Fly(x=295, y=60, img="fly.png"),
+                     Fly(x=490, y=60, img="fly.png"),
+                     Fly(x=685, y=60, img="fly.png"),
+                     Fly(x=880, y=60, img="fly.png"))
 
+    timerGameTime = 0
     timeFlyMovement = 0
     timeFlySpawn = 0
     collisionTimer = 0
@@ -247,8 +255,12 @@ def main():
     ''' 0: Intro State
         1: Play State
         2: Pause State
-        3: Over State '''
+        3: Win State
+        4: Over State '''
     gameState = 1
+    wave = 1
+    gameTime = 60
+    gameTimeDecrease = 0
 
     # Main game loop
     while 1:
@@ -274,11 +286,20 @@ def main():
 
             # Fill screen to "update scene"
             screen.fill(black)
+            pygame.draw.rect(screen, white, (0, 0, width, 30))
 
+            # Render Fonts
             # 60fps cap
             fpsText = myfont.render("fps:" + str(int(clock.get_fps())), True, black)
-            lifeText = myfont.render("Life:" + str(objFrog.life), True, black)
+            lifeText = myfont.render("Lives:" + str(objFrog.life), True, black)
+            gameTimeText = myfont.render("Time Remaining:" + str(gameTime), True, black)
             clock.tick(60)
+
+            # Main Timer Countdown
+            timerGameTime += clock.get_time()
+            if timerGameTime >= 1000:
+                gameTime -=1
+                timerGameTime = 0
 
             # Update the rest of the images after the background
 
@@ -339,10 +360,13 @@ def main():
             # Update texts
 
             # FPS
-            screen.blit(fpsText, (0, 0))
+            screen.blit(fpsText, (940, -5))
 
             # Frog Life
-            screen.blit(lifeText, (0, 30))
+            screen.blit(lifeText, (5, -5))
+
+            # Time
+            screen.blit(gameTimeText, (200, -5))
 
             for car in listObjectCar:
                 screen.blit(car.image, car.rect)
@@ -396,29 +420,26 @@ def main():
                         Fly.activeFlySequence.discard(randomFlySpawn)
                         listObjectFly[randomFlySpawn].alive = False
                         objFrog.kills += 1
+                        objFrog.ResetPosition()
 
             # Frog - Car
             if objFrog.rect.y > height/2:   # if statement for increased efficiency
                 for enemy in listObjectCar:
                     if objFrog.rect.colliderect(enemy.rect):
-                        print("collision")
+                        objFrog.life -= 1
                         objFrog.ResetPosition()
                         break
 
-
-
-            # Reset Frog position when it goes off screen (staying on turtle for too long)
+            # Reset Frog position when it goes out of bounds(staying on turtle for too long)
             if (objFrog.rect.x > width) or (objFrog.rect.x < -30):
+                objFrog.life -= 1
                 objFrog.ResetPosition()
 
-            if objFrog.kills == 5:
-                print("Game Won!!")
-
-            if objFrog.life == 0:
-                print("Game Lost!!")
+            if (objFrog.rect.y < 100) and not(objFrog.rect.colliderect(listObjectFly[randomFlySpawn].rect)):
+                objFrog.life -= 1
+                objFrog.ResetPosition()
 
             pygame.display.update()
-
 
             # Capture all events (keyboard events)
             for event in pygame.event.get():
@@ -430,6 +451,12 @@ def main():
                     gameState = 2
 
             if objFrog.life == 0:
+                gameState = 4
+
+            if gameTime <= 0:
+                gameState = 4
+
+            if objFrog.kills == 5:
                 gameState = 3
 
         # --PAUSE STATE--
@@ -445,8 +472,21 @@ def main():
                     gameState = 1
                 exitGame(event)
 
-        # --OVER STATE--
+        # --WIN STATE--
         elif gameState == 3:
+            # Update Win State
+
+            # Win State Transitions
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                    if gameTimeDecrease < 20:
+                        gameTimeDecrease += 2
+                    gameTime = 60 - gameTimeDecrease
+                    wave += 1
+                    gameState = 1
+
+        # --OVER STATE--
+        elif gameState == 4:
             pass
 
 
