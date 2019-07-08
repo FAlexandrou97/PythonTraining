@@ -266,7 +266,7 @@ def main():
         2: Pause State
         3: Win State
         4: Over State '''
-    gameState = 1
+    gameState = 0
     wave = 1
     gameTime = 60
     gameTimeDecrease = 0
