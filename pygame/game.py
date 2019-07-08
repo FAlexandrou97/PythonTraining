@@ -143,6 +143,50 @@ def fill(surface, color):
             surface.set_at((x, y), pygame.Color(r, g, b, a))
 
 
+def initialiseObjects():
+    objFrog = Frog()
+
+    # Car Object
+    listObjectCar = (Car(x=0, y=460, img="carBlack.png"),
+                     Car(x=400, y=460, img="carTruckRight.png"),
+                     Car(x=width, y=410, img="carFast.png"),
+                     Car(x=0, y=365, img="carWhiteRight.png"),
+                     Car(x=width - 100, y=320, img="carTruckLeft.png"),
+                     Car(x=100, y=320, img="carWhiteLeft.png"))
+
+    # Turtle Object
+    listObjectTurtle = (Turtle(x=145, y=252, img="turtle.png"),
+                        Turtle(x=190, y=252, img="turtle.png"),
+                        Turtle(x=235, y=252, img="turtle.png"),
+                        Turtle(x=545, y=252, img="turtle.png"),
+                        Turtle(x=590, y=252, img="turtle.png"),
+                        Turtle(x=45, y=185, img="turtle.png"),
+                        Turtle(x=90, y=185, img="turtle.png"),
+                        Turtle(x=135, y=185, img="turtle.png"),
+                        Turtle(x=745, y=185, img="turtle.png"),
+                        Turtle(x=790, y=185, img="turtle.png"),
+                        Turtle(x=30, y=115, img="turtle.png"),
+                        Turtle(x=275, y=115, img="turtle.png"),
+                        Turtle(x=565, y=115, img="turtle.png"),
+                        Turtle(x=890, y=115, img="turtle.png"))
+
+    # Trunk Object
+    listObjectTrunk = (Trunk(x=width / 2, y=215, img="trunk.png"),
+                       Trunk(x=width + 100, y=215, img="trunk.png"),
+                       Trunk(x=width - 100, y=145, img="trunk.png"),
+                       Trunk(x=width / 3, y=145, img="trunk.png"),
+                       Trunk(x=width - 200, y=145, img="trunk.png"))
+
+    # Fly Object
+    listObjectFly = (Fly(x=100, y=60, img="fly.png"),
+                     Fly(x=295, y=60, img="fly.png"),
+                     Fly(x=490, y=60, img="fly.png"),
+                     Fly(x=685, y=60, img="fly.png"),
+                     Fly(x=880, y=60, img="fly.png"))
+
+    return objFrog, listObjectCar, listObjectTurtle, listObjectTrunk, listObjectFly
+
+
 def main():
     # Scene Setup
 
@@ -197,7 +241,7 @@ def main():
     # Fonts
     myfont = pygame.font.SysFont('Comic Sans MS', 25)
     pauseFont = pygame.font.SysFont('Comic Sans MS', 75)
-    winFont = pygame.font.SysFont('Comic Sans MS', 30)
+    winFont = pygame.font.SysFont('Comic Sans MS', 32)
 
     # Music
     pygame.mixer.music.load("music.mp3")
@@ -206,46 +250,9 @@ def main():
     # Clock Object
     clock = pygame.time.Clock()
 
-    # Frog Object
-    objFrog = Frog()
+    # Main Character + Moving Objects
+    objFrog, listObjectCar, listObjectTurtle, listObjectTrunk, listObjectFly = initialiseObjects()
 
-    # Car Object
-    listObjectCar = (Car(x=0, y=460, img="carBlack.png"),
-                     Car(x=400, y=460, img="carTruckRight.png"),
-                     Car(x=width, y=410, img="carFast.png"),
-                     Car(x=0, y=365, img="carWhiteRight.png"),
-                     Car(x=width-100, y=320, img="carTruckLeft.png"),
-                     Car(x=100, y=320, img="carWhiteLeft.png"))
-
-    # Turtle Object
-    listObjectTurtle = (Turtle(x=145, y=252, img="turtle.png"),
-                        Turtle(x=190, y=252, img="turtle.png"),
-                        Turtle(x=235, y=252, img="turtle.png"),
-                        Turtle(x=545, y=252, img="turtle.png"),
-                        Turtle(x=590, y=252, img="turtle.png"),
-                        Turtle(x=45, y=185, img="turtle.png"),
-                        Turtle(x=90, y=185, img="turtle.png"),
-                        Turtle(x=135, y=185, img="turtle.png"),
-                        Turtle(x=745, y=185, img="turtle.png"),
-                        Turtle(x=790, y=185, img="turtle.png"),
-                        Turtle(x=30, y=115, img="turtle.png"),
-                        Turtle(x=275, y=115, img="turtle.png"),
-                        Turtle(x=565, y=115, img="turtle.png"),
-                        Turtle(x=890, y=115, img="turtle.png"))
-                        
-    # Trunk Object
-    listObjectTrunk = (Trunk(x=width/2, y=215, img="trunk.png"),
-                       Trunk(x=width+100, y=215, img="trunk.png"),
-                       Trunk(x=width-100, y=145, img="trunk.png"),
-                       Trunk(x=width/3, y=145, img="trunk.png"),
-                       Trunk(x=width-200, y=145, img="trunk.png"))
-
-    # Fly Object
-    listObjectFly = (Fly(x=100, y=60, img="fly.png"),
-                     Fly(x=295, y=60, img="fly.png"),
-                     Fly(x=490, y=60, img="fly.png"),
-                     Fly(x=685, y=60, img="fly.png"),
-                     Fly(x=880, y=60, img="fly.png"))
 
     timerGameTime = 0
     timeFlyMovement = 0
@@ -383,16 +390,16 @@ def main():
 
             # FPS
             if showFPS:
-                screen.blit(fpsText, (940, -5))
+                screen.blit(fpsText, (940, 0))
 
             # Frog Life
-            screen.blit(lifeText, (5, -5))
+            screen.blit(lifeText, (5, 0))
 
             # Time
-            screen.blit(gameTimeText, (210, -5))
+            screen.blit(gameTimeText, (210, 0))
 
             # Wave
-            screen.blit(waveText, (100, -5))
+            screen.blit(waveText, (100, 0))
 
             for car in listObjectCar:
                 screen.blit(car.image, car.rect)
@@ -431,7 +438,7 @@ def main():
 
                 # Frog - Water
                 elif objFrog.rect.colliderect(water):
-                    print("collision")
+                    objFrog.life -= 1
                     objFrog.ResetPosition()
 
                 # Frog - Fly
@@ -533,7 +540,28 @@ def main():
 
         # --OVER STATE--
         elif gameState == 4:
-            pass
+            #Update Over State
+            listOverText = (winFont.render("Game Over!! Thank you for playing :)", True, black),
+                            winFont.render("You have reached Wave: " + str(wave), True, black),
+                            winFont.render("Press R to restart game or ESC to quit", True, black))
+            h = height/2-150
+            for text in listOverText:
+                screen.blit(text, (250, h))
+                h+=50
+            pygame.display.update()
+
+            # Over State Transitions
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
+                    gameState = 1
+                    wave = 1
+                    gameTime = 60
+                    gameTimeDecrease = 0
+                    objFrog, listObjectCar, listObjectTurtle, listObjectTrunk, listObjectFly = initialiseObjects()
+
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                        exitGame(event)
+
 
 
 if __name__ == "__main__":
