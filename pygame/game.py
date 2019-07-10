@@ -235,6 +235,7 @@ def main():
                          greenGrassImage.get_rect(x=740, y=30),
                          greenGrassImage.get_rect(x=935, y=30))
 
+    # Cookie
     cookieImage = pygame.image.load("cookie.png")
     cookieImage = pygame.transform.smoothscale(cookieImage, (200, 200))
     cookie = cookieImage.get_rect(x=width / 2 - 200, y=height / 2 - 100)
