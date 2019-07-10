@@ -28,20 +28,16 @@ class Frog:
         down = [0, self.radius]
         # Keyboard Controls
         if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
-            print("Going Left")
             # Boundaries
             if(frog.x > xMin):
                 self.rect = frog.move(left)
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
-            print("Going Right")
             if(frog.x < xMax):
                 self.rect = frog.move(right)
         if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
-            print("Going Up")
             if(frog.y > yMin):
                 self.rect = frog.move(up)
         if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
-            print("Going Down")
             if(frog.y < yMax):
                 self.rect = frog.move(down)
 
@@ -237,10 +233,14 @@ def main():
                          greenGrassImage.get_rect(x=545, y=30),
                          greenGrassImage.get_rect(x=740, y=30),
                          greenGrassImage.get_rect(x=935, y=30))
+
+    cookieImage = pygame.image.load("cookie.png")
+    cookieImage = pygame.transform.smoothscale(cookieImage, (200, 200))
+    cookie = cookieImage.get_rect(x=width/2-200, y=height/2 - 100)
     
     # Fonts
     myfont = pygame.font.SysFont('Comic Sans MS', 25)
-    pauseFont = pygame.font.SysFont('Comic Sans MS', 75)
+    pauseFont = pygame.font.SysFont('Comic Sans MS', 60)
     winFont = pygame.font.SysFont('Comic Sans MS', 32)
 
     # Music
@@ -253,7 +253,8 @@ def main():
     # Main Character + Moving Objects
     objFrog, listObjectCar, listObjectTurtle, listObjectTrunk, listObjectFly = initialiseObjects()
 
-
+    carDifficulty = 30
+    timeCarMovement = 0
     timerGameTime = 0
     timeFlyMovement = 0
     timeFlySpawn = 0
@@ -265,10 +266,12 @@ def main():
         1: Play State
         2: Pause State
         3: Win State
-        4: Over State '''
+        4: Over State
+        5: Cookie State'''
     gameState = 0
+    gameWon = False
     wave = 1
-    gameTime = 60
+    gameTime = 120
     gameTimeDecrease = 0
     showFPS = False
 
@@ -284,7 +287,7 @@ def main():
                              winFont.render("Extra: Wave System with increasing difficulty", True, black),
                              winFont.render("Controls", True, black),
                              winFont.render("Arrow keys: Move frog", True, black),
-                             winFont.render("P: Pause/Show Controls", True, black),
+                             winFont.render("P: Toggle Pause/Show Controls", True, black),
                              winFont.render("ESC: Exit Game", True, black),
                              winFont.render("F: Show FPS", True, black),
                              winFont.render("Enter/Return: Start Game/Advance to next wave", True, black))
@@ -405,12 +408,15 @@ def main():
                 screen.blit(car.image, car.rect)
 
             # Car Movement
-            listObjectCar[0].Movement(velocity=2, direction="right")
-            listObjectCar[1].Movement(velocity=2, direction="right")
-            listObjectCar[2].Movement(velocity=10, direction="left")
-            listObjectCar[3].Movement(velocity=3, direction="right")
-            listObjectCar[4].Movement(velocity=4, direction="left")
-            listObjectCar[5].Movement(velocity=4, direction="left")
+            timeCarMovement += clock.get_time()
+            if timeCarMovement >= carDifficulty:
+                timeCarMovement = 0
+                listObjectCar[0].Movement(velocity=2, direction="right")
+                listObjectCar[1].Movement(velocity=2, direction="right")
+                listObjectCar[2].Movement(velocity=10, direction="left")
+                listObjectCar[3].Movement(velocity=3, direction="right")
+                listObjectCar[4].Movement(velocity=4, direction="left")
+                listObjectCar[5].Movement(velocity=4, direction="left")
 
 
             # COLLISION DETECTION - RESOLUTION
@@ -504,11 +510,25 @@ def main():
             if objFrog.kills == 5:
                 gameState = 3
 
+            if wave == 5 and not gameWon:
+                gameState = 5
+                gameWon = True
+
         # --PAUSE STATE--
         elif gameState == 2:
             # Update Pause State
             pauseText = pauseFont.render("PAUSED", True, black)
-            screen.blit(pauseText, (width/2-125, height/2-75))
+            listControlsText = (winFont.render("Controls", True, black),
+                                winFont.render("Arrow keys: Move frog", True, black),
+                                winFont.render("P: Toggle Pause/Show Controls", True, black),
+                                winFont.render("ESC: Exit Game", True, black),
+                                winFont.render("F: Show FPS", True, black),
+                                winFont.render("Enter/Return: Start Game/Advance to next wave", True, black))
+            screen.blit(pauseText, (width/2-125, height/2-200))
+            h = height/2-100
+            for text in listControlsText:
+                screen.blit(text, (120, h))
+                h+=50
             pygame.display.update()
 
             # Pause State Transitions
@@ -520,16 +540,24 @@ def main():
         # --WIN STATE--
         elif gameState == 3:
             # Update Win State
-            winText = winFont.render("Congratulations, Press Enter to proceed to the next wave!!", True, black)
-            screen.blit(winText, (100, height / 2 - 75))
+            winText = (winFont.render("Congratulations for passing wave " + str(wave), True, black),
+                       winFont.render("Press Enter to proceed to the next wave!!", True, black),
+                       myfont.render("Notice: After each wave the cars move faster and the time decreases!!", True, black),
+                       myfont.render("Reach wave 5 for a small surprise!", True, black))
+            h = height/2 -75
+            for text in winText:
+                screen.blit(text, (100, h))
+                h+=50
             pygame.display.update()
             # Win State Transitions
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                     objFrog.ResetPosition()
-                    if gameTimeDecrease < 20:
-                        gameTimeDecrease += 2
-                    gameTime = 60 - gameTimeDecrease
+                    if gameTimeDecrease < 45:
+                        gameTimeDecrease += 15
+                    if carDifficulty > 0:
+                        carDifficulty -= 10
+                    gameTime = 120 - gameTimeDecrease
                     wave += 1
                     gameState = 1
                     listObjectFly = (Fly(x=100, y=60, img="fly.png"),
@@ -538,9 +566,10 @@ def main():
                                      Fly(x=685, y=60, img="fly.png"),
                                      Fly(x=880, y=60, img="fly.png"))
 
+
         # --OVER STATE--
         elif gameState == 4:
-            #Update Over State
+            # Update Over State
             listOverText = (winFont.render("Game Over!! Thank you for playing :)", True, black),
                             winFont.render("You have reached Wave: " + str(wave), True, black),
                             winFont.render("Press R to restart game or ESC to quit", True, black))
@@ -555,13 +584,36 @@ def main():
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
                     gameState = 1
                     wave = 1
-                    gameTime = 60
+                    gameTime = 120
                     gameTimeDecrease = 0
                     objFrog, listObjectCar, listObjectTurtle, listObjectTrunk, listObjectFly = initialiseObjects()
 
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                         exitGame(event)
 
+        elif gameState == 5:
+            pass
+            # Update Cookie state
+            listCookieText = (winFont.render("GAME WON!!!", True, black),
+                              winFont.render("Well Done! Here, take a cookie!", True, black))
+            listAfterCookieText = (myfont.render("Thank you for your time spent!", True, black),
+                                   myfont.render("The game's difficulty won't increase further", True, black),
+                                   myfont.render("Press Enter to Continue", True, black))
+            h = height / 2 - 190
+            h2 = height - 210
+            for text in listCookieText:
+                screen.blit(text, (250, h))
+                h += 50
+            for text in listAfterCookieText:
+                screen.blit(text, (250, h2))
+                h2+=50
+            screen.blit(cookieImage, cookie)
+            pygame.display.update()
+
+            # Cookie State Transitions
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                    gameState = 1
 
 
 if __name__ == "__main__":
