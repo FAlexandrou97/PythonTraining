@@ -2,6 +2,7 @@ import sys
 import pygame
 import os.path
 import random
+
 pygame.init()
 pygame.mixer.init()
 pygame.font.init()
@@ -21,7 +22,7 @@ class Frog:
     # Class Methods
     def Movement(self, event):
         frog = self.rect
-        boundaries = yMin, xMin, xMax, yMax = self.radius, self.radius, width-self.radius*2, height-self.radius
+        boundaries = yMin, xMin, xMax, yMax = self.radius, self.radius, width - self.radius * 2, height - self.radius
         right = [self.radius, 0]
         left = [-self.radius, 0]
         up = [0, -self.radius]
@@ -29,16 +30,16 @@ class Frog:
         # Keyboard Controls
         if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
             # Boundaries
-            if(frog.x > xMin):
+            if (frog.x > xMin):
                 self.rect = frog.move(left)
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
-            if(frog.x < xMax):
+            if (frog.x < xMax):
                 self.rect = frog.move(right)
         if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
-            if(frog.y > yMin):
+            if (frog.y > yMin):
                 self.rect = frog.move(up)
         if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
-            if(frog.y < yMax):
+            if (frog.y < yMax):
                 self.rect = frog.move(down)
 
     def ResetPosition(self):
@@ -88,13 +89,12 @@ class Trunk(MovingModel):
 
     def __init__(self, x, y, img):
         MovingModel.__init__(self, x, y, img)
-        self.image = pygame.transform.smoothscale(self.image, (self.radius+50, self.radius-45))
+        self.image = pygame.transform.smoothscale(self.image, (self.radius + 50, self.radius - 45))
 
 
 class Fly(MovingModel):
     radius = 40
     activeFlySequence = set([0, 1, 2, 3, 4])
-
 
     def __init__(self, x, y, img):
         MovingModel.__init__(self, x, y, img)
@@ -117,7 +117,6 @@ class Fly(MovingModel):
             self.rect = self.rect.move(0, self.velocity)
 
 
-
 def exitGame(event):
     if event.type == pygame.QUIT:
         sys.exit()
@@ -129,6 +128,8 @@ def exitGame(event):
 Source:
 stackoverflow.com/questions/42821442/how-do-i-change-the-colour-of-an-image-in-pygame-without-changing-its-transparen
 '''
+
+
 def fill(surface, color):
     """Fill all pixels of the surface with color, preserve transparency."""
     w, h = surface.get_size()
@@ -196,26 +197,26 @@ def main():
 
     # Road
     roadImage = pygame.image.load("road.png")
-    roadImage = pygame.transform.scale(roadImage, (width, int(height/3)))
+    roadImage = pygame.transform.scale(roadImage, (width, int(height / 3)))
     road = roadImage.get_rect(x=0, y=height * 0.542)
 
     # Water
     waterImage = pygame.image.load("water.png")
-    waterImage = pygame.transform.scale(waterImage, (roadImage.get_width(), roadImage.get_height()-30))
-    water = waterImage.get_rect(x=0, y=height * 0.14 +30)
+    waterImage = pygame.transform.scale(waterImage, (roadImage.get_width(), roadImage.get_height() - 30))
+    water = waterImage.get_rect(x=0, y=height * 0.14 + 30)
 
     # Grass
     grassImage = pygame.image.load("grass.jpg")
-    listGrass = (grassImage.get_rect(x=0, y=height-175),
-                 grassImage.get_rect(x=200, y=height-175),
-                 grassImage.get_rect(x=400, y=height-175),
-                 grassImage.get_rect(x=600, y=height-175),
-                 grassImage.get_rect(x=800, y=height-175),
-                 grassImage.get_rect(x=0, y=height* 0.4),
-                 grassImage.get_rect(x=200, y=height* 0.4),
-                 grassImage.get_rect(x=400, y=height* 0.4),
-                 grassImage.get_rect(x=600, y=height* 0.4),
-                 grassImage.get_rect(x=800, y=height* 0.4))
+    listGrass = (grassImage.get_rect(x=0, y=height - 175),
+                 grassImage.get_rect(x=200, y=height - 175),
+                 grassImage.get_rect(x=400, y=height - 175),
+                 grassImage.get_rect(x=600, y=height - 175),
+                 grassImage.get_rect(x=800, y=height - 175),
+                 grassImage.get_rect(x=0, y=height * 0.4),
+                 grassImage.get_rect(x=200, y=height * 0.4),
+                 grassImage.get_rect(x=400, y=height * 0.4),
+                 grassImage.get_rect(x=600, y=height * 0.4),
+                 grassImage.get_rect(x=800, y=height * 0.4))
 
     greenGrassImage = pygame.image.load("grass_green.jpg")
     greenGrassTopImage = pygame.transform.smoothscale(greenGrassImage, (200, 20))
@@ -236,8 +237,8 @@ def main():
 
     cookieImage = pygame.image.load("cookie.png")
     cookieImage = pygame.transform.smoothscale(cookieImage, (200, 200))
-    cookie = cookieImage.get_rect(x=width/2-200, y=height/2 - 100)
-    
+    cookie = cookieImage.get_rect(x=width / 2 - 200, y=height / 2 - 100)
+
     # Fonts
     myfont = pygame.font.SysFont('Comic Sans MS', 25)
     pauseFont = pygame.font.SysFont('Comic Sans MS', 60)
@@ -283,7 +284,8 @@ def main():
             # Update Intro State
             screen.fill(skyBlue)
             listIntroText = (winFont.render("FROGGER - Press Enter To Start", True, black),
-                             winFont.render("Goal: Eat all flies and avoid getting drown or hit by cars!!", True, black),
+                             winFont.render("Goal: Eat all flies and avoid getting drown or hit by cars!!", True,
+                                            black),
                              winFont.render("Extra: Wave System with increasing difficulty", True, black),
                              winFont.render("Controls", True, black),
                              winFont.render("Arrow keys: Move frog", True, black),
@@ -291,17 +293,18 @@ def main():
                              winFont.render("ESC: Exit Game", True, black),
                              winFont.render("F: Show FPS", True, black),
                              winFont.render("Enter/Return: Start Game/Advance to next wave", True, black))
-            listDeveloperText = (myfont.render("The game was created for the summer hacker challenge 2019 of UCLan Cyprus", True, black),
-                                 myfont.render("Student/Developer: Floris Alexandrou", True, black))
+            listDeveloperText = (
+            myfont.render("The game was created for the summer hacker challenge 2019 of UCLan Cyprus", True, black),
+            myfont.render("Student/Developer: Floris Alexandrou", True, black))
 
             h = 0
             for text in listIntroText:
                 screen.blit(text, (100, h))
-                h+=50
-            h+=50
+                h += 50
+            h += 50
             for text in listDeveloperText:
                 screen.blit(text, (100, h))
-                h+=50
+                h += 50
             pygame.display.update()
 
             # Intro State Transitions
@@ -330,7 +333,7 @@ def main():
             # Main Timer Countdown
             timerGameTime += clock.get_time()
             if timerGameTime >= 1000:
-                gameTime -=1
+                gameTime -= 1
                 timerGameTime = 0
 
             # Update the rest of the images after the background
@@ -351,17 +354,17 @@ def main():
 
             # Update Turtle
             for turtle in listObjectTurtle:
-                turtle.Movement(velocity=2.5,direction="right")
+                turtle.Movement(velocity=2, direction="right")
                 screen.blit(turtle.image, turtle.rect)
 
             # Update Trunk
             for trunk in listObjectTrunk:
-                trunk.Movement(velocity=1.5, direction="left")
+                trunk.Movement(velocity=2, direction="left")
                 screen.blit(trunk.image, trunk.rect)
 
             # Update Fly
-            timeFlyMovement = timeFlyMovement + clock.get_time()
-            timeFlySpawn = timeFlySpawn + clock.get_time()
+            timeFlyMovement += clock.get_time()
+            timeFlySpawn += clock.get_time()
 
             # Fly Movement
             # Slow down movement because minimum velocity is 1
@@ -372,7 +375,7 @@ def main():
 
             # Fly random spawn
             if timeFlySpawn >= 5000:
-                if len(Fly.activeFlySequence) > 0 :
+                if len(Fly.activeFlySequence) > 0:
                     randomFlySpawn = random.choice(tuple(Fly.activeFlySequence))
                     timeFlySpawn = 0
 
@@ -381,7 +384,7 @@ def main():
                 if fly.alive:
                     # Render Random Fly
                     screen.blit(listObjectFly[randomFlySpawn].image,
-                    listObjectFly[randomFlySpawn].rect)
+                                listObjectFly[randomFlySpawn].rect)
                 else:
                     # Render Dead Fly
                     screen.blit(fly.image, fly.rect)
@@ -418,13 +421,12 @@ def main():
                 listObjectCar[4].Movement(velocity=4, direction="left")
                 listObjectCar[5].Movement(velocity=4, direction="left")
 
-
             # COLLISION DETECTION - RESOLUTION
 
             frogTurtleCollision = False
             frogTrunkCollision = False
             # Frog - Turtle
-            if objFrog.rect.y < height/2:   # if statement for increased efficiency
+            if objFrog.rect.y < height / 2:  # if statement for increased efficiency
                 for turtle in listObjectTurtle:
                     if objFrog.rect.colliderect(water) and objFrog.rect.colliderect(turtle.rect):
                         frogTurtleCollision = True
@@ -438,9 +440,9 @@ def main():
 
                 # Collision Resolutions
                 if frogTurtleCollision:
-                    objFrog.rect = objFrog.rect.move(turtle.velocity,0)
+                    objFrog.rect = objFrog.rect.move(turtle.velocity, 0)
                 elif frogTrunkCollision:
-                    objFrog.rect = objFrog.rect.move(-trunk.velocity,0)
+                    objFrog.rect = objFrog.rect.move(-trunk.velocity, 0)
 
                 # Frog - Water
                 elif objFrog.rect.colliderect(water):
@@ -450,7 +452,7 @@ def main():
                 # Frog - Fly
                 # Check if frog collides with the random spawned fly
                 collisionTimer += clock.get_time()
-                if collisionTimer >= 200:   # Added to fix an error causing the collision to occur multiple times
+                if collisionTimer >= 200:  # Added to fix an error causing the collision to occur multiple times
                     if objFrog.rect.colliderect(listObjectFly[randomFlySpawn].rect):
                         collisionTimer = 0
                         # Turn fly into green color
@@ -462,7 +464,7 @@ def main():
                         objFrog.ResetPosition()
 
             # Frog - Car
-            if objFrog.rect.y > height/2:   # if statement for increased efficiency
+            if objFrog.rect.y > height / 2:  # if statement for increased efficiency
                 for enemy in listObjectCar:
                     if objFrog.rect.colliderect(enemy.rect):
                         objFrog.life -= 1
@@ -470,11 +472,11 @@ def main():
                         break
 
             # Reset Frog position when it goes out of bounds(e.g staying on turtle for too long)
-            if (objFrog.rect.x > width-10) or (objFrog.rect.x < -20):
+            if (objFrog.rect.x > width - 10) or (objFrog.rect.x < -20):
                 objFrog.life -= 1
                 objFrog.ResetPosition()
 
-            if (objFrog.rect.y < 100) and not(objFrog.rect.colliderect(listObjectFly[randomFlySpawn].rect)):
+            if (objFrog.rect.y < 100) and not (objFrog.rect.colliderect(listObjectFly[randomFlySpawn].rect)):
                 objFrog.life -= 1
                 objFrog.ResetPosition()
 
@@ -491,7 +493,7 @@ def main():
                     else:
                         showFPS = False
 
-            # Play State Transitions
+                # Play State Transitions
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
                     gameState = 2
 
@@ -524,11 +526,11 @@ def main():
                                 winFont.render("ESC: Exit Game", True, black),
                                 winFont.render("F: Show FPS", True, black),
                                 winFont.render("Enter/Return: Start Game/Advance to next wave", True, black))
-            screen.blit(pauseText, (width/2-125, height/2-200))
-            h = height/2-100
+            screen.blit(pauseText, (width / 2 - 125, height / 2 - 200))
+            h = height / 2 - 100
             for text in listControlsText:
                 screen.blit(text, (120, h))
-                h+=50
+                h += 50
             pygame.display.update()
 
             # Pause State Transitions
@@ -542,12 +544,13 @@ def main():
             # Update Win State
             winText = (winFont.render("Congratulations for passing wave " + str(wave), True, black),
                        winFont.render("Press Enter to proceed to the next wave!!", True, black),
-                       myfont.render("Notice: After each wave the cars move faster and the time decreases!!", True, black),
+                       myfont.render("Notice: After each wave the cars move faster and the time decreases!!", True,
+                                     black),
                        myfont.render("Reach wave 5 for a small surprise!", True, black))
-            h = height/2 -75
+            h = height / 2 - 75
             for text in winText:
                 screen.blit(text, (100, h))
-                h+=50
+                h += 50
             pygame.display.update()
             # Win State Transitions
             for event in pygame.event.get():
@@ -566,17 +569,16 @@ def main():
                                      Fly(x=685, y=60, img="fly.png"),
                                      Fly(x=880, y=60, img="fly.png"))
 
-
         # --OVER STATE--
         elif gameState == 4:
             # Update Over State
             listOverText = (winFont.render("Game Over!! Thank you for playing :)", True, black),
                             winFont.render("You have reached Wave: " + str(wave), True, black),
                             winFont.render("Press R to restart game or ESC to quit", True, black))
-            h = height/2-150
+            h = height / 2 - 150
             for text in listOverText:
                 screen.blit(text, (250, h))
-                h+=50
+                h += 50
             pygame.display.update()
 
             # Over State Transitions
@@ -589,7 +591,7 @@ def main():
                     objFrog, listObjectCar, listObjectTurtle, listObjectTrunk, listObjectFly = initialiseObjects()
 
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                        exitGame(event)
+                    exitGame(event)
 
         elif gameState == 5:
             pass
@@ -606,7 +608,7 @@ def main():
                 h += 50
             for text in listAfterCookieText:
                 screen.blit(text, (250, h2))
-                h2+=50
+                h2 += 50
             screen.blit(cookieImage, cookie)
             pygame.display.update()
 
