@@ -1,2 +1,2 @@
 # PythonTraining
-Python training for the acm competition
+Machine Learning, Games Development, Web Scraping and other projects related to python.
