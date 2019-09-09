@@ -18,7 +18,7 @@ train_generator = datagen_train.flow_from_directory(base_path + "train",
                                                     shuffle=True)
 
 
-test_datagen = ImageDataGenerator()
+test_datagen = ImageDataGenerator(rescale=1/255)
 
 test_generator = test_datagen.flow_from_directory(
     directory=base_path+'/predict',
@@ -43,4 +43,4 @@ labels = dict((v,k) for k,v in labels.items())
 predictions = [labels[k] for k in predicted_class_indices]
 print(labels)
 
-print(predictions)
+print(predicted_class_indices)
