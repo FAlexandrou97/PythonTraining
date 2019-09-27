@@ -1,5 +1,6 @@
-# Javascript Code (paste line by line in console)
+# Javascript Code (Copy paste function and call it)
 '''
+function webScrape(){
 // pull down jquery into the JavaScript console
 var script = document.createElement('script');
 script.src = "https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js";
@@ -15,6 +16,7 @@ hiddenElement.href = 'data:attachment/text,' + encodeURI(textToSave);
 hiddenElement.target = '_blank';
 hiddenElement.download = 'urls.txt';
 hiddenElement.click();
+}
 '''
 
 # Execute in terminal : python AI/WebImageScraper/WebImageScraper.py --urls AI/WebImageScraper/urls.txt --output AI/WebImageScraper/images/
