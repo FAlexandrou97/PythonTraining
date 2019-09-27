@@ -1,3 +1,5 @@
+# Udacity Linear Refresher Course
+
 import math
 
 
