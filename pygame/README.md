@@ -15,3 +15,10 @@ I have attempted to follow an object-oriented approach that formats the code for
 3. Win State
 4. Over State
 5. Cookie State
+
+### Starting Game Screen
+
+![image](https://i.ibb.co/YcbmVzj/1.png)
+
+### Gameplay Screen
+![image](https://i.ibb.co/FbwCxFr/2.png)
